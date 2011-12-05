@@ -1,29 +1,22 @@
 #!/bin/bash
 
 CLOUD=/home/konrad/android/updates
-VISION=/home/konrad/android/builds/vision-cm
-OUT=out/target/product/vision
+VISION=/home/konrad/android/builds/cm7
+OUT=out/target/product/PHONE
+PHONE=
+
+export USE_CCACHE=1
+export CCACHE_DIR=/home/konrad/android/.ccache
+prebuilt/linux-x86/ccache/ccache -M 40G
+
+printf "Compile for which Phone?"
+read PHONE
 
 cd $VISION
-printf "Syncing..."
-echo
-echo
 repo sync -j16
-printf "Downloading RomManager..."
-echo
-echo
+make clean -j16
 cd vendor/cyanogen/
 ./get-rommanager
-rm $CLOUD/vision-cm7.zip
-printf "Compiling CM7 for HTC Vision..."
-echo
-echo
 cd $VISION
-. build/envsetup.sh && brunch vision
-printf "Moving Vision-CM7 zip to the Cloud..."
-echo
-echo
-mv $OUT/update-cm*.zip $CLOUD/vision-cm7.zip
-printf "Done."
-echo
-echo
+. build/envsetup.sh && brunch $PHONE
+mv $OUT/update-cm*.zip $CLOUD/$PHONE-cm7.zip
