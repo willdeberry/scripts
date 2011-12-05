@@ -1,0 +1,29 @@
+#!/bin/bash
+
+CLOUD=/home/konrad/android/updates
+VISION=/home/konrad/android/builds/vision-cm
+OUT=out/target/product/vision
+
+cd $VISION
+printf "Syncing..."
+echo
+echo
+repo sync -j16
+printf "Downloading RomManager..."
+echo
+echo
+cd vendor/cyanogen/
+./get-rommanager
+rm $CLOUD/vision-cm7.zip
+printf "Compiling CM7 for HTC Vision..."
+echo
+echo
+cd $VISION
+. build/envsetup.sh && brunch vision
+printf "Moving Vision-CM7 zip to the Cloud..."
+echo
+echo
+mv $OUT/update-cm*.zip $CLOUD/vision-cm7.zip
+printf "Done."
+echo
+echo
