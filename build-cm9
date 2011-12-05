@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CLOUD=/home/konrad/android/updates
-VISION=/home/konrad/android/builds/cm7
+BUILD_DIR=/home/konrad/android/builds/cm9
 OUT=out/target/product/PHONE
 PHONE=
 
@@ -9,14 +9,11 @@ export USE_CCACHE=1
 export CCACHE_DIR=/home/konrad/android/.ccache
 prebuilt/linux-x86/ccache/ccache -M 40G
 
-printf "Compile for which Phone?"
+printf "Compile for which HTC Phone?"
 read PHONE
 
-cd $VISION
+cd $BUILD_DIR
 repo sync -j16
 make clean -j16
-cd vendor/cyanogen/
-./get-rommanager
-cd $VISION
-. build/envsetup.sh && brunch $PHONE
-mv $OUT/update-cm*.zip $CLOUD/$PHONE-cm7.zip
+. build/envsetup.sh && lunch htc_$PHONE-eng && make -j2 otapackage
+mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
