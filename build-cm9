@@ -7,7 +7,7 @@ PHONE=
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/konrad/android/.ccache
-prebuilt/linux-x86/ccache/ccache -M 40G
+prebuilt/linux-x86/ccache -M 40G
 
 printf "Compile for which HTC Phone?"
 read PHONE
