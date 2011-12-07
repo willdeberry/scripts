@@ -7,12 +7,12 @@ PHONE=
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/konrad/android/.ccache
-prebuilt/linux-x86/ccache -M 40G
 
 printf "Compile for which HTC Phone?"
 read PHONE
 
 cd $BUILD_DIR
+prebuilt/linux-x86/ccache -M 40G
 repo sync -j16
 make clean -j16
 . build/envsetup.sh && lunch htc_$PHONE-eng && make -j2 otapackage
