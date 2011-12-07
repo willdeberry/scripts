@@ -8,7 +8,7 @@ PHONE=
 export USE_CCACHE=1
 export CCACHE_DIR=/home/konrad/android/.ccache
 
-printf "Compile for which HTC Phone?"
+printf "Compile for which HTC Phone?\n"
 read PHONE
 
 cd $BUILD_DIR
