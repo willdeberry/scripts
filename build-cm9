@@ -18,5 +18,5 @@ cd $CCACHE
 cd $BUILD_DIR
 repo sync -j16
 make clean -j16
-. build/envsetup.sh && lunch htc_$PHONE-eng && make -j4 otapackage
+. build/envsetup.sh && lunch htc_$PHONE-eng && make -j6 otapackage
 mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
