@@ -3,7 +3,6 @@
 CLOUD=/home/konrad/android/updates
 BUILD_DIR=/home/konrad/android/builds/cm9
 OUT=out/target/product/PHONE
-CCACHE=prebuilt/linux-x86/ccache
 PHONE=
 
 export USE_CCACHE=1
@@ -13,9 +12,7 @@ printf "Compile for which HTC Phone?\n"
 read PHONE
 
 cd $BUILD_DIR
-cd $CCACHE
-./ccache -M 40G
-cd $BUILD_DIR
+ccache -M 40G
 repo sync -j16
 make clean -j16
 . build/envsetup.sh && lunch htc_$PHONE-eng && make -j6 otapackage
