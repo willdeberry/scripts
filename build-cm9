@@ -11,24 +11,6 @@ Option2="Repo Sync"
 export USE_CCACHE=1
 export CCACHE_DIR=/home/konrad/android/.ccache
 
-PS3='Please enter your choice: '
-options=("$Option1" "$Option2" "Quit")
-select opt in "${options[@]}"
-do
-    case $opt in
-        "$Option1")
-            full
-            ;;
-        "$Option2")
-            sync
-            ;;
-        "Quit")
-            break
-            ;;
-        *) echo invalid option;;
-    esac
-done
-
 function sync {
     cd $BUILD_DIR
     repo sync -j16
@@ -46,3 +28,21 @@ function full {
     . build/envsetup.sh && lunch htc_$PHONE-eng && make -j6 otapackage
     mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
 }
+
+PS3='Please enter your choice: '
+options=("$Option1" "$Option2" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "$Option1")
+            full
+            ;;
+        "$Option2")
+            sync
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo invalid option;;
+    esac
+done
