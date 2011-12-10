@@ -36,9 +36,11 @@ do
     case $opt in
         "$Option1")
             full
+            break
             ;;
         "$Option2")
             sync
+            break
             ;;
         "Quit")
             break
