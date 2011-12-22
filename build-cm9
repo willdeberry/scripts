@@ -17,15 +17,15 @@ function sync {
 }
 
 function full {
-    printf "Compile for which HTC Phone?\n"
-    read PHONE
-
+#    printf "Compile for which HTC Phone?\n"
+#    read PHONE
+#
     cd $CCACHE
     ./ccache -M 40G
     cd $BUILD_DIR
     repo sync -j16
     make clean -j16
-    . build/envsetup.sh && lunch htc_$PHONE-eng && make -j6 otapackage
+    . build/envsetup.sh && lunch htc_$1-eng && make -j6 otapackage
     mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
 }
 
