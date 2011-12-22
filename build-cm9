@@ -25,7 +25,9 @@ function full {
     cd $BUILD_DIR
     repo sync -j16
     make clean -j16
-    . build/envsetup.sh && lunch htc_$1-eng && make -j6 otapackage
+    . build/envsetup.sh
+    lunch htc_$1-eng
+    make -j6 otapackage
     mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
 }
 
