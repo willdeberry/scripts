@@ -28,7 +28,7 @@ function full {
     . build/envsetup.sh
     lunch htc_$1-eng
     make -j6 otapackage
-    mv $OUT/htc_*.zip $CLOUD/$PHONE-cm9.zip
+    mv $OUT/htc_*.zip $CLOUD/$1-cm9.zip
 }
 
 PS3='Please enter your choice: '
