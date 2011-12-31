@@ -26,9 +26,9 @@ function full {
     repo sync -j16
     make clean -j16
     . build/envsetup.sh
-    lunch htc_$1-eng
+    lunch cm_$1_userdebug
     make -j6 otapackage
-    mv $OUT/htc_*.zip $CLOUD/$1-cm9.zip
+    mv $OUT/cm_toro*.zip $CLOUD/$1-cm9.zip
 }
 
 PS3='Please enter your choice: '
