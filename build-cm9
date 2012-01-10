@@ -27,6 +27,7 @@ function full {
     make clean -j16
     . build/envsetup.sh
     lunch cm_toro-userdebug
+    ./vendor/cm/get-prebuilts
     make -j6 otapackage
     mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
 }
