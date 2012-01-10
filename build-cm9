@@ -26,7 +26,7 @@ function full {
     repo sync -j16
     make clean -j16
     . build/envsetup.sh
-    lunch cm_toro_userdebug
+    lunch cm_toro-userdebug
     make -j6 otapackage
     mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
 }
