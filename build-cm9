@@ -2,7 +2,7 @@
 
 CLOUD=/home/konrad/android/updates
 BUILD_DIR=/home/konrad/android/builds/cm9
-OUT=out/target/product/PHONE
+OUT=out/target/product/toro
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 PHONE=
 Option1="Full Build"
