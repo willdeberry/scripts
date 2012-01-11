@@ -24,7 +24,7 @@ function full {
     ./ccache -M 40G
     cd $BUILD_DIR
     repo sync -j16
-    make clean -j16
+#    make clean -j16
     . build/envsetup.sh
     lunch cm_toro-userdebug
     ./vendor/cm/get-prebuilts
