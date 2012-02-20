@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CLOUD=/home/konrad/android/updates
-BUILD_DIR=/home/konrad/android/builds/cm9
+CLOUD=/home/$USER/android/updates
+BUILD_DIR=/home/$USER/android/builds/cm9
 OUT=out/target/product/toro
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
@@ -9,7 +9,7 @@ Option2="Full Build"
 Option3="Clean Build"
 
 export USE_CCACHE=1
-export CCACHE_DIR=/home/konrad/android/.ccache
+export CCACHE_DIR=/home/$USER/android/.ccache
 
 function sync {
     cd $BUILD_DIR
