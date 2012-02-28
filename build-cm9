@@ -25,7 +25,7 @@ function toro {
     lunch cm_toro-userdebug
     ./vendor/cm/get-prebuilts
     make -j4 otapackage
-    mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
+    ssh storage -t mv /home/downloads/android/builds/cm9/out/target/product/toro/cm_toro-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/toro-cm9.zip
 }
 
 function tf101 {
@@ -36,7 +36,7 @@ function tf101 {
     lunch full_tf101-userdebug
     ./vendor/cm/get-prebuilts
     make -j4 otapackage
-    mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
+    ssh storage -t mv /home/downloads/android/builds/cm9/out/target/product/tf101/full_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cm9.zip
 }
 
 function clean {
