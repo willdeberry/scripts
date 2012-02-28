@@ -24,7 +24,7 @@ function full {
     . build/envsetup.sh
     lunch cm_toro-userdebug
     ./vendor/cm/get-prebuilts
-    make -j6 otapackage
+    make -j4 otapackage
     mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
 }
 
