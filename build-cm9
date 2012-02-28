@@ -5,8 +5,9 @@ BUILD_DIR=/home/$USER/android/builds/cm9
 OUT=out/target/product/toro
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
-Option2="Full Build"
-Option3="Clean Build"
+Option2="Build for Toro"
+Option3="Build for TF101"
+Option4="Clean Build"
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/android/.ccache
@@ -16,13 +17,23 @@ function sync {
     repo sync -j16
 }
 
-function full {
+function toro {
     cd $CCACHE
     ./ccache -M 40G
-    cd $BUILD_DIR
-    repo sync -j16
+    sync
     . build/envsetup.sh
     lunch cm_toro-userdebug
+    ./vendor/cm/get-prebuilts
+    make -j4 otapackage
+    mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
+}
+
+function tf101 {
+    cd $CCACHE
+    ./ccache -M 40G
+    sync
+    . build/envsetup.sh
+    lunch full_tf101-userdebug
     ./vendor/cm/get-prebuilts
     make -j4 otapackage
     mv $OUT/cm_toro*.zip $CLOUD/toro-cm9.zip
@@ -43,10 +54,14 @@ do
             break
             ;;
         "$Option2")
-            full
+            toro
             break
             ;;
         "$Option3")
+            tf101
+            break
+            ;;
+        "$Option4")
             clean
             break
             ;;
