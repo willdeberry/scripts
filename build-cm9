@@ -33,7 +33,7 @@ function tf101 {
     ./ccache -M 40G
     sync
     . build/envsetup.sh
-    lunch full_tf101-userdebug
+    lunch cm_tf101-userdebug
     ./vendor/cm/get-prebuilts
     make -j4 otapackage
     ssh storage -t mv /home/downloads/android/builds/cm9/out/target/product/tf101/full_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cm9.zip
