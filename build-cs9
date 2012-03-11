@@ -1,0 +1,55 @@
+#!/bin/bash
+
+BUILD_DIR=/home/$USER/android/builds/cornerstone
+OUT=out/target/product/tf101
+CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
+Option1="Repo Sync"
+Option2="Build Cornerstone for TF101"
+Option3="Clean Build"
+
+export USE_CCACHE=1
+export CCACHE_DIR=/home/$USER/android/.ccache
+
+function sync {
+    cd $BUILD_DIR
+    repo sync -j16
+}
+
+function tf101 {
+    cd $CCACHE
+    ./ccache -M 40G
+    sync
+    . build/envsetup.sh
+    lunch cm_tf101-userdebug
+    make -j4 otapackage
+    ssh storage -t cp /home/downloads/android/builds/cornerstone/out/target/product/tf101/cm_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cornerstone.zip
+}
+
+function clean {
+    cd $BUILD_DIR
+    make clean -j16
+}
+
+PS3='Please enter your choice: '
+options=("$Option1" "$Option2" "$Option3" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "$Option1")
+            sync
+            break
+            ;;
+        "$Option2")
+            tf101
+            break
+            ;;
+        "$Option3")
+            clean
+            break
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo invalid option;;
+    esac
+done
