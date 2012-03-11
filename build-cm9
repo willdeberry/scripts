@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CLOUD=/home/$USER/android/updates
 BUILD_DIR=/home/$USER/android/builds/cm9
 OUT=out/target/product/toro
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
