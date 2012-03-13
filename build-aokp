@@ -28,6 +28,8 @@ function tf101 {
 
 function clean {
     cd $BUILD_DIR
+    . build/envsetup.sh
+    lunch aokp_tf101-userdebug
     make clean -j16
 }
 
