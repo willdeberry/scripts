@@ -21,9 +21,8 @@ function toro {
     ./ccache -M 40G
     sync
     . build/envsetup.sh
-    lunch cm_toro-userdebug
     ./vendor/cm/get-prebuilts
-    make -j4 otapackage
+    brunch toro
     ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/toro/cm_toro-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/toro-cm9.zip
 }
 
@@ -32,9 +31,8 @@ function tf101 {
     ./ccache -M 40G
     sync
     . build/envsetup.sh
-    lunch cm_tf101-userdebug
     ./vendor/cm/get-prebuilts
-    make -j4 otapackage
+    brunch tf101
     ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/tf101/cm_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cm9.zip
 }
 

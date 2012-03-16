@@ -20,8 +20,7 @@ function tf101 {
     ./ccache -M 40G
     sync
     . build/envsetup.sh
-    lunch cm_tf101-userdebug
-    make -j4 otapackage
+    brunch tf101
     ssh storage -t cp /home/downloads/android/builds/cornerstone/out/target/product/tf101/cm_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cornerstone.zip
 }
 
