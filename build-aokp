@@ -22,7 +22,7 @@ function tf101 {
     sync
     . build/envsetup.sh
     brunch tf101
-    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-aokp.zip
+    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101_milestone-4.zip /home/will/Dropbox/Public/android/updates/tf101-aokp.zip
 }
 
 function clean {
