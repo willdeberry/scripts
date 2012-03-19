@@ -23,7 +23,7 @@ function toro {
     . build/envsetup.sh
     ./vendor/cm/get-prebuilts
     brunch toro
-    ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/toro/cm_toro-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/toro-cm9.zip
+    ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/toro/update-cm*.zip /home/will/Dropbox/Public/android/updates/toro-cm9.zip
 }
 
 function tf101 {
@@ -33,7 +33,7 @@ function tf101 {
     . build/envsetup.sh
     ./vendor/cm/get-prebuilts
     brunch tf101
-    ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/tf101/cm_tf101-ota-eng.will.zip /home/will/Dropbox/Public/android/updates/tf101-cm9.zip
+    ssh storage -t cp /home/downloads/android/builds/cm9/out/target/product/tf101/update-cm*.zip /home/will/Dropbox/Public/android/updates/tf101-cm9.zip
 }
 
 function clean {
