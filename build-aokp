@@ -6,7 +6,7 @@ OUT=out/target/product/tf101
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
 Option2="Build for TF101"
-Option3="Clean Build"
+Option3="Clean then Build"
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/android/.ccache
@@ -47,6 +47,7 @@ do
             ;;
         "$Option3")
             clean
+            tf101
             break
             ;;
         "Quit")

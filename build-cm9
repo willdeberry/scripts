@@ -6,7 +6,8 @@ CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
 Option2="Build for Toro"
 Option3="Build for TF101"
-Option4="Clean Build"
+Option4="Clean then Build Toro"
+Option5="Clean then Build TF101"
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/android/.ccache
@@ -42,7 +43,7 @@ function clean {
 }
 
 PS3='Please enter your choice: '
-options=("$Option1" "$Option2" "$Option3" "$Option4" "Quit")
+options=("$Option1" "$Option2" "$Option3" "$Option4" "$Option5" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -60,6 +61,12 @@ do
             ;;
         "$Option4")
             clean
+            toro
+            break
+            ;;
+        "$Option5")
+            clean
+            tf101
             break
             ;;
         "Quit")
