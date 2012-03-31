@@ -6,7 +6,9 @@ OUT=out/target/product/tf101
 CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
 Option2="Build for TF101"
-Option3="Clean then Build"
+Option3="Build for Toro"
+Option4="Clean then Build TF101"
+Option5="Clean then Build Toro"
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/android/.ccache
@@ -25,6 +27,15 @@ function tf101 {
     ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101_*.zip /home/will/Dropbox/Public/android/updates/tf101-aokp.zip
 }
 
+function toro {
+    cd $CCACHE
+    ./ccache -M 40G
+    sync
+    . build/envsetup.sh
+    brunch toro
+    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/toro/aokp_toro_*.zip /home/will/Dropbox/Public/android/updates/toro-aokp.zip
+}
+
 function clean {
     cd $BUILD_DIR
     . build/envsetup.sh
@@ -33,7 +44,7 @@ function clean {
 }
 
 PS3='Please enter your choice: '
-options=("$Option1" "$Option2" "$Option3" "Quit")
+options=("$Option1" "$Option2" "$Option3" "$Option4" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -46,8 +57,17 @@ do
             break
             ;;
         "$Option3")
+            toro
+            break
+            ;;
+        "$Option4")
             clean
             tf101
+            break
+            ;;
+        "$Option5")
+            clean
+            toro
             break
             ;;
         "Quit")
