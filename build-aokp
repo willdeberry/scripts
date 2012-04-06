@@ -24,7 +24,7 @@ function tf101 {
     sync
     . build/envsetup.sh
     brunch tf101
-    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101_*.zip /home/will/Dropbox/Public/android/updates/tf101-aokp.zip
+    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101_*.zip /home/will/Dropbox/Public/android/updates/
 }
 
 function toro {
@@ -33,7 +33,7 @@ function toro {
     sync
     . build/envsetup.sh
     brunch toro
-    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/toro/aokp_toro_*.zip /home/will/Dropbox/Public/android/updates/toro-aokp.zip
+    ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/toro/aokp_toro_*.zip /home/will/Dropbox/Public/android/updates/
 }
 
 function clean {
