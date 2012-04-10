@@ -21,7 +21,7 @@ function sync {
 function tf101 {
     cd $CCACHE
     ./ccache -M 40G
-    sync
+    cd $BUILD_DIR
     . build/envsetup.sh
     brunch tf101
     ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/tf101/aokp_tf101_*.zip /home/will/Dropbox/Public/android/updates/
@@ -30,7 +30,7 @@ function tf101 {
 function toro {
     cd $CCACHE
     ./ccache -M 40G
-    sync
+    cd $BUILD_DIR
     . build/envsetup.sh
     brunch toro
     ssh storage -t cp /home/downloads/android/builds/aokp/out/target/product/toro/aokp_toro_*.zip /home/will/Dropbox/Public/android/updates/
