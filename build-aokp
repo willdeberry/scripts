@@ -1,9 +1,7 @@
 #!/bin/bash
 
-CLOUD=/home/$USER/android/updates
 BUILD_DIR=/home/$USER/android/builds/aokp
 OUT=out/target/product/tf101
-CCACHE=$BUILD_DIR/prebuilt/linux-x86/ccache
 Option1="Repo Sync"
 Option2="Build for TF101"
 Option3="Build for Toro"
@@ -11,7 +9,7 @@ Option4="Clean then Build TF101"
 Option5="Clean then Build Toro"
 
 export USE_CCACHE=1
-export CCACHE_DIR=/home/$USER/android/.ccache
+export CCACHE_DIR=/home/$USER/.ccache
 
 function sync {
     cd $BUILD_DIR
@@ -19,8 +17,7 @@ function sync {
 }
 
 function tf101 {
-    cd $CCACHE
-    ./ccache -M 40G
+    ccache -M 40G
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch tf101
@@ -28,8 +25,7 @@ function tf101 {
 }
 
 function toro {
-    cd $CCACHE
-    ./ccache -M 40G
+    ccache -M 40G
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch toro
