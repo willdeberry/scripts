@@ -30,9 +30,9 @@ function clean {
     make clean -j16
 }
 
-if "$ACTION" = "sync" then
+if [ "$ACTION" = "sync" ]; then
     sync
-elif "ACTION" = "clean" then
+elif [ "ACTION" = "clean" ]; then
     clean
 else
     build
