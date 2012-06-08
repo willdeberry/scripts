@@ -1,0 +1,39 @@
+#!/bin/bash
+
+BUILD_DIR=/home/$USER/android/builds/aokp
+OUT=out/target/product/tf101
+
+export USE_CCACHE=1
+export CCACHE_DIR=/home/$USER/.ccache
+
+ACTION=$1
+
+function sync {
+    cd $BUILD_DIR
+    repo sync -j32
+}
+
+function build {
+    ccache -M 40G
+    cd $BUILD_DIR
+    . build/envsetup.sh
+    brunch $ACTION
+    if [ -f out/product/$ACTION/aokp_$ACTION_*.zip ]
+        scp out/target/product/$ACTION/aokp_$ACTION_*.zip storage:/home/will/Dropbox/Public/android/updates/
+    fi
+}
+
+function clean {
+    cd $BUILD_DIR
+    . build/envsetup.sh
+    lunch aokp_$ACTION-userdebug
+    make clean -j16
+}
+
+if $ACTION = "sync" then
+    sync
+elif $ACTION = "clean" then
+    clean
+else
+    build
+fi
