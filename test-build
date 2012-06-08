@@ -26,8 +26,6 @@ function build {
 
 function clean {
     cd $BUILD_DIR
-    . build/envsetup.sh
-    lunch aokp_$ACTION-userdebug
     make clean -j16
 }
 
