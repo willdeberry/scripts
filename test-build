@@ -7,6 +7,7 @@ export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/.ccache
 
 ACTION=$1
+DEVICE=$2
 
 function sync {
     cd $BUILD_DIR
@@ -26,6 +27,7 @@ function build {
 
 function clean {
     cd $BUILD_DIR
+    lunch aokp_$DEVICE-userdebug
     make clean -j16
 }
 
