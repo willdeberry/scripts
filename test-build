@@ -18,7 +18,8 @@ function build {
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch $ACTION
-    if [ -e out/product/$ACTION/aokp_$ACTION_*.zip ] then
+    if [ -e out/product/$ACTION/aokp_$ACTION_*.zip ];
+    then
         scp out/target/product/$ACTION/aokp_$ACTION_*.zip storage:/home/will/Dropbox/Public/android/updates/
     fi
 }
@@ -30,9 +31,11 @@ function clean {
     make clean -j16
 }
 
-if [ "$ACTION" = "sync" ]; then
+if [ "$ACTION" = "sync" ];
+then
     sync
-elif [ "ACTION" = "clean" ]; then
+elif [ "ACTION" = "clean" ];
+then
     clean
 else
     build
