@@ -21,7 +21,7 @@ function build {
     brunch $ACTION
     if [ -e out/product/$ACTION/aokp_$ACTION_*.zip ];
     then
-        scp out/target/product/$ACTION/aokp_$ACTION_*.zip storage:/home/will/Dropbox/Public/android/updates/
+        cp out/target/product/$ACTION/aokp_$ACTION_*.zip ../../updates/
     fi
 }
 
