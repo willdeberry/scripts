@@ -27,6 +27,7 @@ function build {
 
 function clean {
     cd $BUILD_DIR
+    . build/envsetup.sh
     lunch aokp_$DEVICE-userdebug
     make clean -j16
 }
