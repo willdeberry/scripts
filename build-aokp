@@ -19,9 +19,9 @@ function build {
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch $ACTION
-    if [[ -e out/target/product/$ACTION/aokp_$ACTION_*.zip ]];
+    if [[ -e out/target/product/$ACTION/aokp_${ACTION}_*.zip ]];
     then
-        cp out/target/product/$ACTION/aokp_$ACTION_*.zip ../../updates/
+        cp out/target/product/$ACTION/aokp_${ACTION}_*.zip ../../updates/
     fi
 }
 
