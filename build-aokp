@@ -19,9 +19,10 @@ function build {
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch $ACTION
-    if [[ -e out/target/product/$ACTION/aokp_${ACTION}_*.zip ]];
+    if [ -e out/target/product/$ACTION/aokp_${ACTION}_*.zip ];
     then
         cp out/target/product/$ACTION/aokp_${ACTION}_*.zip ../../updates/
+        echo "Successfully copied to Dropbox..."
     fi
 }
 
