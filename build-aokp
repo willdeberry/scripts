@@ -33,12 +33,22 @@ function clean {
     make clean -j16
 }
 
+function clobber {
+    cd $BUILD_DIR
+    . build/envsetup.sh
+    lunch aokp_$DEVICE-userdebug
+    make clobber -j16
+}
+
 if [ "$ACTION" = "sync" ];
 then
     sync
 elif [ "$ACTION" = "clean" ];
 then
     clean
+elif [ "$ACTION" = "clobber" ];
+then
+    clobber
 else
     build
 fi
