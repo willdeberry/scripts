@@ -1,7 +1,6 @@
 #!/bin/bash
 
-BUILD_DIR=/home/$USER/android/builds/aokp
-OUT=out/target/product/tf101
+BUILD_DIR=/home/$USER/android/builds/jb-aokp
 
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/.ccache
