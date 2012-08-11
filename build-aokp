@@ -35,7 +35,6 @@ function clean {
 function clobber {
     cd $BUILD_DIR
     . build/envsetup.sh
-    lunch aokp_$DEVICE-userdebug
     make clobber -j16
 }
 
