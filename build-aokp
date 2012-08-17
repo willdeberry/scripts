@@ -16,6 +16,7 @@ function sync {
 }
 
 function build {
+    remove
     ccache -M 40G
     brunch $ACTION
     find . -name aokp_${ACTION}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
@@ -28,6 +29,10 @@ function clean {
 
 function clobber {
     make clobber -j16
+}
+
+function remove {
+    find . -name aokp_${ACTION}_\*.zip -exec rm -rf {} \;
 }
 
 if [ "$ACTION" = "sync" ];
