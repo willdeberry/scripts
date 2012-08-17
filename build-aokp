@@ -18,11 +18,8 @@ function build {
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch $ACTION
-    if [ -f out/target/product/$ACTION/aokp_${ACTION}_*.zip ]
-    then
-        cp out/target/product/$ACTION/aokp_${ACTION}_*.zip ../../updates/
-        echo "Successfully copied to Dropbox..."
-    fi
+    find . -name *${ACTION}_\* -exec cp {} ../../updates/ \; -exec echo 
+                 "Successfully copied to Dropbox..." \;
 }
 
 function clean {
