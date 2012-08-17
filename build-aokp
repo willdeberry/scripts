@@ -18,7 +18,7 @@ function build {
     cd $BUILD_DIR
     . build/envsetup.sh
     brunch $ACTION
-    find . -name aokp_${ACTION}_\*.zip -exec cp {} ../../updates/ \; -exec echo 
+    find . -name aokp_${ACTION}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo 
                  "Successfully copied to Dropbox..." \;
 }
 
