@@ -8,30 +8,25 @@ export CCACHE_DIR=/home/$USER/.ccache
 ACTION=$1
 DEVICE=$2
 
+cd $BUILD_DIR
+. build/envsetup.sh
+
 function sync {
-    cd $BUILD_DIR
     repo sync -j32
 }
 
 function build {
     ccache -M 40G
-    cd $BUILD_DIR
-    . build/envsetup.sh
     brunch $ACTION
-    find . -name aokp_${ACTION}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo 
-                 "Successfully copied to Dropbox..." \;
+    find . -name aokp_${ACTION}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
 }
 
 function clean {
-    cd $BUILD_DIR
-    . build/envsetup.sh
     lunch aokp_$DEVICE-userdebug
     make clean -j16
 }
 
 function clobber {
-    cd $BUILD_DIR
-    . build/envsetup.sh
     make clobber -j16
 }
 
