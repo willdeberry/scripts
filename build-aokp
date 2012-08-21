@@ -1,15 +1,10 @@
 #!/bin/bash
 
-BUILD_DIR=/home/$USER/jb-aokp
-
 export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/.ccache
 
-ACTION=$1
+BUILD_DIR=/home/$USER/jb-aokp
 DEVICE=$2
-
-cd $BUILD_DIR
-. build/envsetup.sh
 
 function sync {
     repo sync -j32
@@ -19,7 +14,18 @@ function build {
     remove
     ccache -M 40G
     brunch $ACTION
-    find . -name aokp_${ACTION}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
+    find . -name aokp_${DEVICE}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
+}
+
+function help {
+    echo "usage: ./build-aokp [OPTIONS] DEVICE
+
+    Options:
+      -h, --help      Show this help message and exit
+      -l, --clean     Runs make clean based on the device
+      -c, --clobber   Performs a make clobber on the source
+      -s, --sync      Runs a repo sync -j32
+      -b, --build     Builds the current source. Requires DEVICE be provided"
 }
 
 function clean {
@@ -35,15 +41,45 @@ function remove {
     find . -name aokp_${ACTION}_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
 }
 
-if [ "$ACTION" = "sync" ];
-then
-    sync
-elif [ "$ACTION" = "clean" ];
-then
-    clean
-elif [ "$ACTION" = "clobber" ];
-then
-    clobber
-else
-    build
-fi
+for arg
+do
+    delim=""
+    case "$arg" in
+        --help) args="${args} -h ";;
+        --clean) args="${args} -l ";;
+        --clobber) args="${args} -c ";;
+        --sync) args="${args} -s ";;
+        --build) args="${args} -b ";;
+    *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+        args="${args}${delim}${arg}${delim} ";;
+    esac
+done
+
+eval set -- $args
+    while getopts ":hsclb?" option 2>/dev/null
+    do
+        case $option in
+            h) help
+                exit
+                ;;
+            s) sync
+                exit
+                ;;
+            c) clobber
+                exit
+                ;;
+            l) clean
+                exit
+                ;;
+            b) build
+                exit
+                ;;
+            *) echo $OPTARG is an unrecognized option;
+                help
+                exit
+                ;;
+        esac
+    done
+
+cd $BUILD_DIR
+. build/envsetup.sh
