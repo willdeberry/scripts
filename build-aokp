@@ -18,14 +18,14 @@ function build {
 }
 
 function help {
-    echo "usage: ./build-aokp [OPTIONS] DEVICE
+    echo -e "usage: ./build-aokp [OPTIONS] DEVICE \n"
 
-    Options:
-      -h, --help      Show this help message and exit
-      -l, --clean     Runs make clean based on the device
-      -c, --clobber   Performs a make clobber on the source
-      -s, --sync      Runs a repo sync -j32
-      -b, --build     Builds the current source. Requires DEVICE be provided"
+    echo "Options:
+  -h, --help      Show this help message and exit
+  -l, --clean     Runs make clean based on the device
+  -c, --clobber   Performs a make clobber on the source
+  -s, --sync      Runs a repo sync -j32
+  -b, --build     Builds the current source. Requires DEVICE be provided"
 }
 
 function clean {
