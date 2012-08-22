@@ -63,16 +63,12 @@ eval set -- $args
                 exit
                 ;;
             s) sync
-                exit
                 ;;
             c) clobber
-                exit
                 ;;
             l) clean
-                exit
                 ;;
             b) build
-                exit
                 ;;
             *) echo $OPTARG is an unrecognized option;
                 help
