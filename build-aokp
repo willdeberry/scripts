@@ -20,7 +20,7 @@ function build {
 }
 
 function help {
-    echo -e "usage: ./build-aokp [OPTIONS] DEVICE \n"
+    echo -e "usage: $0 [OPTIONS] DEVICE \n"
 
     echo "Options:
   -h, --help      Show this help message and exit
