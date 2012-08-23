@@ -15,7 +15,7 @@ function sync {
 function build {
     remove
     ccache -M 40G
-    brunch $ACTION
+    brunch $DEVICE
     find . -name aokp_${DEVICE}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
 }
 
