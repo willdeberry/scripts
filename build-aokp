@@ -4,7 +4,9 @@ export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/.ccache
 
 BUILD_DIR=/home/$USER/jb-aokp
-DEVICE=$2
+
+for i in $@; do :; done
+DEVICE=$i
 
 function sync {
     repo sync -j32
