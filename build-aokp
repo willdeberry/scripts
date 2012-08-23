@@ -41,6 +41,15 @@ function remove {
     find . -name aokp_${ACTION}_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
 }
 
+if [ "$1" == "" ]
+then
+    help
+    exit
+else
+    cd $BUILD_DIR
+    . build/envsetup.sh
+fi
+
 for arg
 do
     delim=""
@@ -76,6 +85,3 @@ eval set -- $args
                 ;;
         esac
     done
-
-cd $BUILD_DIR
-. build/envsetup.sh
