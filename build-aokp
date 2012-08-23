@@ -4,6 +4,7 @@ export USE_CCACHE=1
 export CCACHE_DIR=/home/$USER/.ccache
 
 BUILD_DIR=/home/$USER/jb-aokp
+VENDOR=$BUILD_DIR/vendor/aokp
 
 for i in $@; do :; done
 DEVICE=$i
@@ -19,6 +20,16 @@ function build {
     find . -name aokp_${DEVICE}_\*.zip -exec scp {} home:/home/will/updates/ \; -exec echo "Successfully copied to Dropbox..." \;
 }
 
+function build-all {
+    ccache -M 40G
+    cat $VENDOR/vendorsetup.sh | cut -f2 -d ' ' > .build_list
+    while read line ;do
+        DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
+        brunch $DEVNAME
+    done < .build_list
+    rm .bot_lunch
+}
+
 function help {
     echo -e "usage: $0 [OPTIONS] DEVICE \n"
 
@@ -27,7 +38,8 @@ function help {
   -l, --clean     Runs make clean based on the device
   -c, --clobber   Performs a make clobber on the source
   -s, --sync      Runs a repo sync -j32
-  -b, --build     Builds the current source. Requires DEVICE be provided"
+  -b, --build     Builds the current source. Requires DEVICE be provided
+  -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh"
 }
 
 function clean {
@@ -61,13 +73,14 @@ do
         --clobber) args="${args} -c ";;
         --sync) args="${args} -s ";;
         --build) args="${args} -b ";;
-    *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+        --all) args="${args} -a ";;
+        *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hsclb:?" option 2>/dev/null
+    while getopts ":hsclab:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -80,6 +93,8 @@ eval set -- $args
             l) clean
                 ;;
             b) build
+                ;;
+            a) build-all
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
