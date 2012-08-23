@@ -52,7 +52,7 @@ function clobber {
 }
 
 function remove {
-    find . -name aokp_${ACTION}_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+    find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
 }
 
 if [ "$1" == "" ]
