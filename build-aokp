@@ -67,7 +67,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hsclb?" option 2>/dev/null
+    while getopts ":hsclb:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -80,6 +80,10 @@ eval set -- $args
             l) clean
                 ;;
             b) build
+                ;;
+            :) echo "Option -$OPTARG requires an argument."
+                help
+                exit
                 ;;
             *) echo $OPTARG is an unrecognized option;
                 help
