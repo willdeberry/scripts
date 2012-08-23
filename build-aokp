@@ -27,7 +27,7 @@ function build-all {
         DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
         brunch $DEVNAME
     done < .build_list
-    rm .bot_lunch
+    rm .build_list
 }
 
 function help {
