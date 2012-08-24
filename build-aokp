@@ -3,7 +3,7 @@
 #export USE_CCACHE=1
 #export CCACHE_DIR=/home/$USER/.ccache
 
-BUILD_DIR=/home/$USER/jb-aokp
+BUILD_DIR=/home/$USER/aokp
 VENDOR=$BUILD_DIR/vendor/aokp
 
 for i in $@; do :; done
