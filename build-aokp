@@ -26,6 +26,7 @@ function build-all {
     while read line ;do
         DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
         brunch $DEVNAME
+        find . -name aokp_${DEVNAME}_\*.zip -exec cp {} ../files/$DEVNAME/ \; -exec echo "Successfully copied to Androtransfer..." \;
     done < .build_list
     rm .build_list
 }
