@@ -17,7 +17,7 @@ function build {
     remove
 #    ccache -M 40G
     brunch $DEVICE
-    find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files \; -exec echo "Successfully copied to Androtransfer..." \;
+    find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
 }
 
 function build-all {
