@@ -16,7 +16,7 @@ function sync {
 function build {
     remove
 #    ccache -M 40G
-    brunch $DEVICE
+    time brunch $DEVICE
     find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
 }
 
@@ -95,7 +95,7 @@ eval set -- $args
                 ;;
             b) build
                 ;;
-            a) build-all
+            a) time build-all
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
