@@ -9,11 +9,9 @@ cat .tag_list | cut -f2 -d '/' | sed 's/android_//g' | sed 's/_/\//g' | sed 's/e
 
 find $SOURCE -name .git -execdir git tag -a $REVISION -m "$REVISION" \;
 
-cd $SOURCE
 while read REPO ;do
-    cd $REPO
+    cd $SOURCE/$REPO
     pwd
     echo "git push --tags gerrit:/$repo_name" \;
-    cd $SOURCE
 done < .dir_list
 rm .dir_list .tag_list
