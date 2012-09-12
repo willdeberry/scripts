@@ -14,4 +14,4 @@ while read REPO ;do
     pwd
     echo "git push --tags gerrit:/$repo_name" \;
 done < .dir_list
-rm .dir_list .tag_list
+rm $SOURCE/.dir_list $SOURCE/.tag_list
