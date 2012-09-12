@@ -15,7 +15,7 @@ find $SOURCE -name .git -execdir git tag -a $REVISION -m "$REVISION" \;
 while read -u 11 DIR && read -u 12 REPO_DIR ;do
     cd $SOURCE/$DIR
     pwd
-    echo "git push --tags gerrit:/$REPO_DIR" \;
+    echo "git push --tags gerrit:/$REPO_DIR"
 done
 
 exec 11<&- 12<&-
