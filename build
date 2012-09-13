@@ -5,9 +5,16 @@ VENDOR=$BUILD_DIR/vendor/aokp
 
 for i in $@; do :; done
 DEVICE=$i
+APK="${@:(-2):1}"
 
 function sync {
     repo sync -j32
+}
+
+function apk {
+    . build/envsetup.sh
+    lunch aokp_${DEVICE}-userdebug
+    mmm $APK
 }
 
 function build {
@@ -27,7 +34,7 @@ function build-all {
 }
 
 function help {
-    echo -e "usage: $0 [OPTIONS] DEVICE \n"
+    echo -e "usage: $0 [OPTIONS] APK DEVICE \n"
 
     echo "Options:
   -h, --help      Show this help message and exit
@@ -35,7 +42,8 @@ function help {
   -c, --clobber   Performs a make clobber on the source
   -s, --sync      Runs a repo sync -j32
   -b, --build     Builds the current source. Requires DEVICE be provided
-  -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh"
+  -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
+  -m, --mmm       Compiles the specified apk individually. Requires APK be provided"
 }
 
 function clean {
@@ -70,13 +78,14 @@ do
         --sync) args="${args} -s ";;
         --build) args="${args} -b ";;
         --all) args="${args} -a ";;
+        --mmm) args="${args} -m ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hsclab:?" option 2>/dev/null
+    while getopts ":hsclam:b:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -91,6 +100,8 @@ eval set -- $args
             b) build
                 ;;
             a) time build-all
+                ;;
+            m) apk
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
