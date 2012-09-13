@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#export USE_CCACHE=1
-#export CCACHE_DIR=/home/$USER/.ccache
-
 BUILD_DIR=/home/$USER/aokp
 VENDOR=$BUILD_DIR/vendor/aokp
 
@@ -15,13 +12,11 @@ function sync {
 
 function build {
     remove
-#    ccache -M 40G
     time brunch $DEVICE
     find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
 }
 
 function build-all {
-#    ccache -M 40G
     cat $VENDOR/vendorsetup.sh | cut -f2 -d ' ' > .build_list
     while read line ;do
         DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
