@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SOURCE=/home/$USER/aokp
-REVISION=Build-2
+REVISION=Build-3
 
 for file in `find . | grep .git/config`; do cat $file  | grep projectname | tr -d ' ' | cut -f2 -d = | grep AOKP; done > .repo_list
 
