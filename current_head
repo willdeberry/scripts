@@ -3,7 +3,7 @@
 SOURCE=/home/$USER/aokp
 REVISION=build-5-manifest.xml
 
-grep project .repo/manifest.xml | cut -f2 -d '"' > $SOURCE/.dir_list
+grep "<project" .repo/manifest.xml | cut -f2 -d '"' > $SOURCE/.dir_list
 
 exec 11<.dir_list
 
