@@ -1,0 +1,20 @@
+#!/bin/bash
+
+SOURCE=/home/$USER/aokp
+REVISION=build-5-manifest.xml
+
+grep project .repo/manifest.xml | cut -f4 -d '"' > $SOURCE/.repo_list
+grep project .repo/manifest.xml | cut -f2 -d '"' > $SOURCE/.dir_list
+
+find $SOURCE -name .git -execdir git log --pretty=oneline | head -1 | cut -f1 -d ' ' >> $SOURCE/.commit_ids \;
+
+exec 11<.dir_list
+exec 12<.repo_list
+
+#while read -u 11 DIR && read -u 12 REPO_DIR ;do
+#    cd $SOURCE/$DIR
+#    git push gerrit:/$REPO_DIR $REVISION
+#done
+
+exec 11<&- 12<&-
+rm $SOURCE/.dir_list $SOURCE/.repo_list
