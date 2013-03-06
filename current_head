@@ -3,7 +3,7 @@
 SOURCE=/home/$USER/aokp
 REVISION=build-5-manifest.xml
 
-grep "<project" .repo/manifest.xml | cut -f2 -d '"' > $SOURCE/.dir_list
+grep "<project" .repo/manifest.xml | grep "revision=" | cut -f2 -d '"' > $SOURCE/.dir_list
 
 exec 11<.dir_list
 
@@ -11,9 +11,6 @@ while read -u 11 DIR ;do
     cd $SOURCE/$DIR
     git log -n 1 --pretty=oneline | cut -f1 -d ' ' > $SOURCE/.commit_ids
 done
-
-sed '/<default/,/sync-j="4" \/>/d' $SOURCE/.repo/manifest.xml > $SOURCE/$REVISION
-sed -i 's/ revision=".*" \/>//' $SOURCE/$REVISION
 
 exec 12<.commit_ids
 
