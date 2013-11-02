@@ -19,6 +19,7 @@ function apk {
 
 function build {
     remove
+    pick
     time brunch $DEVICE
     if [ ! -d "../files/$DEVICE" ]; then
         mkdir -p ../files/$DEVICE
@@ -36,6 +37,21 @@ function build-all {
         find . -name aokp_${DEVNAME}_\*.zip -exec cp {} ../files/$DEVNAME/ \; -exec echo "Successfully copied to Androtransfer..." \;
     done < .build_list
     rm .build_list
+}
+
+function pick {
+    . build/envsetup.sh
+    cd frameworks/base
+    pstest 13167/8
+    pstest 13236/4
+    pstest 13319/1
+    pstest 13356/1
+    git remote add -f will git@github.com:willdeberry/frameworks_base.git && git cherry-pick cb45926a24cd00ae9071c9cab21338c6ce625487
+    cd -; cd packages/apps/ROMControl
+    pstest 13202/5
+    pstest 13237/5
+    pstest 13318/1
+    cd -
 }
 
 function help {
