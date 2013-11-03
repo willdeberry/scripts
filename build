@@ -19,7 +19,6 @@ function apk {
 
 function build {
     remove
-    pick
     time brunch $DEVICE
     if [ ! -d "../files/$DEVICE" ]; then
         mkdir -p ../files/$DEVICE
@@ -70,7 +69,8 @@ function help {
   -s, --sync      Runs a repo sync -j32
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
-  -m, --mmm       Compiles the specified apk individually. Requires APK be provided"
+  -m, --mmm       Compiles the specified apk individually. Requires APK be provided
+  -p, --pick      Cherry-pick the specific changes"
 }
 
 function clean {
@@ -106,13 +106,14 @@ do
         --build) args="${args} -b ";;
         --all) args="${args} -a ";;
         --mmm) args="${args} -m ";;
+        --pick) args="${args} -p ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hsclam:b:?" option 2>/dev/null
+    while getopts ":hsclamp:b:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -129,6 +130,8 @@ eval set -- $args
             a) time build-all
                 ;;
             m) apk
+                ;;
+            p) pick
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
