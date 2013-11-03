@@ -44,12 +44,11 @@ function pick {
     pstest 13167/8
     pstest 13236/4
     pstest 13319/1
-    pstest 13356/1
+    pstest 13356/2
     pstest 13360/1
-    pstest 13253/1
     pstest 13344/2
     pstest 12904/3
-    git remote add -f will git@github.com:willdeberry/frameworks_base.git && git cherry-pick 1552cf3e1de024d1
+    git cherry-pick 1552cf3e1de024d1
     cd -; cd packages/apps/ROMControl
     pstest 13202/5
     pstest 13237/5
