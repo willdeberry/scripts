@@ -49,7 +49,7 @@ function pick {
     pstest 13253/1
     pstest 13344/2
     pstest 12904/3
-    git remote add -f will git@github.com:willdeberry/frameworks_base.git && git cherry-pick cb45926a24cd00ae9071c9cab21338c6ce625487
+    git remote add -f will git@github.com:willdeberry/frameworks_base.git && git cherry-pick 1552cf3e1de024d1
     cd -; cd packages/apps/ROMControl
     pstest 13202/5
     pstest 13237/5
@@ -113,7 +113,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hsclamp:b:?" option 2>/dev/null
+    while getopts ":hspclam:b:?" option 2>/dev/null
     do
         case $option in
             h) help
