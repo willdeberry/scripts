@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_DIR=/home/$USER/aokp
+BUILD_DIR=$(pwd)
 VENDOR=$BUILD_DIR/vendor/aokp
 
 for i in $@; do :; done
