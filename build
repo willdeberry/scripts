@@ -41,20 +41,33 @@ function build-all {
 function pick {
     . build/envsetup.sh
     cd frameworks/base
-    pstest 13167/8
-    pstest 13236/4
-    pstest 13319/1
-    pstest 13356/2
-    pstest 13360/1
-    pstest 13344/2
-    pstest 12904/3
-    git cherry-pick 1552cf3e1de024d1
+    pstest 13382/1
+    pstest 13402/1
+    pstest 13403/1
     cd -; cd packages/apps/ROMControl
-    pstest 13202/5
-    pstest 13237/5
-    pstest 12913/1
+    pstest 13385/1
     cd -; cd packages/apps/Mms
-    pstest 12913/1
+    pstest 13378/1
+    cd -; cd packages/apps/ContactsCommon
+    pstest 13379/1
+    cd -; cd packages/apps/Contacts
+    pstest 13380/1
+    pstest 13404/1
+    pstest 13405/1
+    pstest 13406/1
+    pstest 13407/1
+    pstest 13408/1
+    pstest 13409/1
+    pstest 13410/1
+    pstest 13411/1
+    pstest 13412/1
+    pstest 13413/1
+    cd -; cd packages/apps/Settings
+    pstest 13381/1
+    pstest 13396/1
+    pstest 13397/1
+    pstest 13398/1
+    pstest 13399/1
     cd -
 }
 
