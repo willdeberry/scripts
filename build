@@ -1,0 +1,157 @@
+#!/bin/bash
+
+BUILD_DIR=$(pwd)
+VENDOR=$BUILD_DIR/vendor/aokp
+
+for i in $@; do :; done
+DEVICE=$i
+APK="${@:(-2):1}"
+
+function sync {
+    repo sync -j32
+}
+
+function apk {
+    . build/envsetup.sh
+    lunch aokp_${DEVICE}-userdebug
+    mmm $APK
+}
+
+function build {
+    remove
+    time brunch $DEVICE
+    if [ ! -d "../files/$DEVICE" ]; then
+        mkdir -p ../files/$DEVICE
+        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
+    else 
+        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
+    fi
+}
+
+function build-all {
+    cat $VENDOR/vendorsetup.sh | cut -f2 -d ' ' > .build_list
+    while read line ;do
+        DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
+        brunch $DEVNAME
+        find . -name aokp_${DEVNAME}_\*.zip -exec cp {} ../files/$DEVNAME/ \; -exec echo "Successfully copied to Androtransfer..." \;
+    done < .build_list
+    rm .build_list
+}
+
+function pick {
+    . build/envsetup.sh
+    cd frameworks/base
+    pstest 13382/1
+    pstest 13402/1
+    pstest 13403/1
+    cd -; cd packages/apps/ROMControl
+    pstest 13385/1
+    cd -; cd packages/apps/Mms
+    pstest 13378/1
+    cd -; cd packages/apps/ContactsCommon
+    pstest 13379/1
+    cd -; cd packages/apps/Contacts
+    pstest 13380/1
+    pstest 13404/1
+    pstest 13405/1
+    pstest 13406/1
+    pstest 13407/1
+    pstest 13408/1
+    pstest 13409/1
+    pstest 13410/1
+    pstest 13411/1
+    pstest 13412/1
+    pstest 13413/1
+    cd -; cd packages/apps/Settings
+    pstest 13381/1
+    pstest 13396/1
+    pstest 13397/1
+    pstest 13398/1
+    pstest 13399/1
+    cd -
+}
+
+function help {
+    echo -e "usage: $0 [OPTIONS] APK DEVICE \n"
+
+    echo "Options:
+  -h, --help      Show this help message and exit
+  -l, --clean     Runs make clean based on the device
+  -c, --clobber   Performs a make clobber on the source
+  -s, --sync      Runs a repo sync -j32
+  -b, --build     Builds the current source. Requires DEVICE be provided
+  -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
+  -m, --mmm       Compiles the specified apk individually. Requires APK be provided
+  -p, --pick      Cherry-pick the specific changes"
+}
+
+function clean {
+    lunch aokp_$DEVICE-userdebug
+    make clean -j16
+}
+
+function clobber {
+    make clobber -j16
+}
+
+function remove {
+    find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+}
+
+if [ "$1" == "" ]
+then
+    help
+    exit
+else
+    cd $BUILD_DIR
+    . build/envsetup.sh
+fi
+
+for arg
+do
+    delim=""
+    case "$arg" in
+        --help) args="${args} -h ";;
+        --clean) args="${args} -l ";;
+        --clobber) args="${args} -c ";;
+        --sync) args="${args} -s ";;
+        --build) args="${args} -b ";;
+        --all) args="${args} -a ";;
+        --mmm) args="${args} -m ";;
+        --pick) args="${args} -p ";;
+        *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+        args="${args}${delim}${arg}${delim} ";;
+    esac
+done
+
+eval set -- $args
+    while getopts ":hspclam:b:?" option 2>/dev/null
+    do
+        case $option in
+            h) help
+                exit
+                ;;
+            s) sync
+                ;;
+            c) clobber
+                ;;
+            l) clean
+                ;;
+            b) build
+                ;;
+            a) time build-all
+                ;;
+            m) apk
+                ;;
+            p) pick
+                ;;
+            :) echo "Option -$OPTARG requires an argument."
+                help
+                exit
+                ;;
+            *) echo $OPTARG is an unrecognized option;
+                help
+                exit
+                ;;
+        esac
+    done

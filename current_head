@@ -1,0 +1,22 @@
+#!/bin/bash
+
+SOURCE=/home/$USER/aokp
+REVISION=build-5-manifest.xml
+
+grep "<project" .repo/manifest.xml | grep "revision=" | cut -f2 -d '"' > $SOURCE/.dir_list
+
+exec 11<.dir_list
+
+while read -u 11 DIR ;do
+    cd $SOURCE/$DIR
+    git log -n 1 --pretty=oneline | cut -f1 -d ' ' > $SOURCE/.commit_ids
+done
+
+exec 12<.commit_ids
+
+while read -u 12 COMMITS ;do
+    sed -i "/^  <project/ s/\$/ revision=\"$COMMITS\" \/>/" $SOURCE/$REVISION
+done
+
+exec 11<&- 12<&-
+rm $SOURCE/.dir_list $SOURCE/.commit_ids
