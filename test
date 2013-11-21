@@ -1,0 +1,21 @@
+#!/bin/bash
+# Cutoff time entered as mm-dd-yy hhmm (24-hr)
+INPUT_DATE=${1}
+INPUT_TIME=${2}
+ 
+CUTOFF="${INPUT_DATE} ${INPUT_TIME}"
+EVAL_DATE=$(date +"%m-%d-%y %H%M")
+ 
+while true; do
+if [ "$EVAL_DATE" == "$CUTOFF" ]; then
+    echo "halting nmap processess..."
+    NPROC=$(ps ax | grep nmap | grep -v grep | awk '{print $1}')
+    while read -r procs; do
+        sudo kill -STOP $procs
+    done <<< "${NPROC}"
+    exit
+else
+echo "not time yet..."
+sleep 60
+fi
+done

@@ -1,0 +1,13 @@
+#!/bin/bash
+SCRIPTS=/home/$USER/.config/conky
+
+if [ -n "$(ps ax | grep -i '[c]onkyrc')" ];
+then
+    pkill conky
+else
+    sleep 5
+    conky -c ~/.config/conky/rings &
+    sleep 5
+    conky -c ~/.config/conky/cpu &
+    conky -c ~/.config/conky/mem &
+fi

@@ -1,0 +1,1 @@
+sshpass -f ~/.apssh ssh -oStrictHostKeyChecking=no $2 $3 wdeberry@appserver.$1.gwn

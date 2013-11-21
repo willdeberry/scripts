@@ -1,0 +1,12 @@
+#!/bin/bash
+
+DOCK=$(lsusb | grep -i Dock)
+
+if [ -n "$DOCK" ]
+then
+    xrandr --output LVDS1 --mode 1600x900 --output VGA1 --mode 1920x1080 --right-of LVDS1
+else
+    #xrandr --output LVDS1 --mode 1600x900 --output VGA1 --pos 0x0
+    #xrandr --output LVDS1 --mode 1600x900
+    xrandr --output LVDS1 --mode 1600x900 --output VGA1 --off
+fi

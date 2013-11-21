@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z "$(ps ax | grep '[v]pnc')" ];
+then
+    sudo vpnc gwn
+else
+    sudo vpnc-disconnect
+fi

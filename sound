@@ -1,0 +1,275 @@
+#!/bin/bash
+
+CUSTOM=$(date +"%H%M%S%m%d%y")
+IPADDRESS=$1
+SAVEDIR=/home/$USER/audio/$CUSTOM
+OUTDIR=/tmp
+FILE=audio-$IPADDRESS.$CUSTOM.mp3
+
+if [ -n "$2" ]; then
+    LENGTH=$2
+fi
+
+function cleanup {
+    rm -rf $OUTDIR/$FILE
+    return $?
+}
+
+function cleanup32 {
+    rm -rf $OUTDIR/sample.*.mp3
+    return $?
+}
+
+function save {
+    if [ -e $SAVEDIR ]; then
+        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
+    else
+        mkdir -p $SAVEDIR
+        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
+    fi
+}
+
+function save32 {
+    if [ -e $SAVEDIR ]; then
+        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
+    else
+        mkdir -p $SAVEDIR
+        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
+    fi
+}
+
+function record317 {
+### process params
+
+RMODE=default
+case "${3}" in
+        hdmi|HDMI)
+                RMODE=hdmi
+                ;;
+        analog)
+                RMODE=analog
+                ;;
+        default|"")
+                ;;
+        *)
+                printhelp
+                exit 0
+                ;;
+esac
+
+
+### try to connect to the machine
+sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS "RMODE=${RMODE} LENGTH=$LENGTH bash" <<'EOFSSH'
+
+PATH="$PATH:/opt/GWN/scripts/"
+
+### print connection success
+echo "connection success" > /dev/stderr
+
+### check to ensure that PX is running
+if [ "$(plcStatus.sh --get-status | head -1)" != "RUNNING" ]; then
+        echo "patient experience not running/ready"
+        exit 100
+fi
+
+### print the volume state
+OUTPUT=$(su - user <<EOF
+processSoundRequest status
+EOF
+)
+
+ISMUTE=$(awk '{print $2}' <<<$OUTPUT)
+VOLUME=$(awk '{print $1}' <<<$OUTPUT)
+
+if [ "${ISMUTE}" == "MUTED" ]; then
+        echo "volume: muted" > /dev/stderr
+        echo "nothing to record, quitting now" > /dev/stderr
+        exit 101
+else
+        echo "volume: $VOLUME" > /dev/stderr
+fi
+
+### determine the monitor we should be recording from
+if [ "${RMODE}" == "default" ]; then
+        if [ "$(persistRead /var/state/PLCState.db HDMI_AUDIO)" == "true" ]; then
+                if [ "$(persistRead /var/state/PLCState.db ANALOG_LINE_LOOP)" == "true" ]; then
+                        RMODE=analog
+                else
+                        RMODE=hdmi
+                fi
+        else
+                RMODE=analog
+        fi
+fi
+
+case "${RMODE}" in
+        analog)
+                su - user <<EOFEOF | grep name: | grep -v hdmi | grep stereo\.monitor | sed -e 's|^.*<\(.*\)>.*$|\1|' > /tmp/monitor.name
+pacmd list-sources
+EOFEOF
+                ADEVICE=$(cat /tmp/monitor.name)
+                ;;
+        hdmi)
+                su - user <<EOFEOF | grep name: | grep hdmi | grep stereo\.monitor | sed -e 's|^.*<\(.*\)>.*$|\1|' > /tmp/monitor.name
+pacmd list-sources
+EOFEOF
+                ;;
+esac
+
+### record the mp3
+echo "recording $LENGTH seconds of audio..." > /dev/stderr
+
+su - user <<EOFEOFEOF
+gst-launch-0.10 -e pulsesrc device="${ADEVICE}" ! audioconvert ! lamemp3enc target=1 bitrate=128 cbr=true ! filesink location=/tmp/out.mp3 >/dev/null 2>&1 &
+
+GSID=\$!
+sleep $LENGTH
+kill -2 \$GSID
+EOFEOFEOF
+
+### output result:
+echo "transmitting mp3" >> /dev/stderr
+cat /tmp/out.mp3
+
+### print success
+echo "all done!" >> /dev/stderr
+
+
+EOFSSH
+}
+
+function printhelp {
+cat <<'HELP'
+sound ${IP_Address} ${Length}
+    IP_Address: the IP address of the target PLC
+    Length:     the length (in seconds) of the mp3 to record
+                (By default, set to 15 seconds if not declared)
+HELP
+}
+
+control_c() {
+    cleanup
+    read -p "$(echo -e '\nPress Enter to exit \n\b')" exitS
+    stty echo
+    exit $?
+}
+
+# trap keyboard interrupt (control-c)
+trap control_c SIGINT
+
+function start {
+    echo -n "PLC Password: "
+    read -s PASSWORD
+
+    echo -e "\nLogging in to find version of PLC....\n"
+    VERSION=$(sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS cat /Version.txt)
+
+    if [ "$VERSION" == "PLC_3_1_7h_GA" ]; then
+        echo -e "Logging in and running Record script for 3.1.7...\n"
+        if [ -z $LENGTH ]; then
+            LENGTH="15"
+            record317 > $OUTDIR/"$FILE"
+        else
+            record317 > $OUTDIR/"$FILE"
+        fi
+
+        echo -e " "
+        echo -n "Would you like to play the file? (y/n): "
+        read PLAY
+
+        PLAYy=$(echo $PLAY | tr '[:upper:]' '[:lower:]' | head -c 1)
+
+        if [ "$PLAYy" == "y" ]; then
+            cvlc $OUTDIR/$FILE --play-and-exit -q
+        fi
+
+        echo -n "Would you like to save the file? (y/n): "
+        read SAVE
+
+        SAVEy=$(echo $SAVE | tr '[:upper:]' '[:lower:]' | head -c 1)
+
+        if [ "$SAVEy" == "y" ]; then
+            save
+            echo -e "You file is located in $SAVEDIR."
+        else
+            cleanup
+        fi
+    elif [ -z "$VERSION" ]; then
+cat <<'EOFINVALID'
+Unbale to connect to PLC to determine version of the PLC.
+Please check for use of correct password or connection to device.
+EOFINVALID
+    else
+        echo -e "Logging in and running Record script for 3.2.x...\n"
+        if [ -z $LENGTH ]; then
+            sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS su - user /opt/GWN/scripts/audio/RecordSamples.sh 15 1>/dev/null
+        else
+            sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS su - user /opt/GWN/scripts/audio/RecordSamples.sh $LENGTH 1>/dev/null
+        fi
+
+        sshpass -p $PASSWORD scp -oStrictHostKeyChecking=no root@$IPADDRESS:$OUTDIR/sample.*.mp3 $OUTDIR/.
+
+        if [ -n "$(find $OUTDIR -name sample.*input*pci*analog*.mp3 2>&-)" ]; then
+            mv $OUTDIR/sample.*input*pci*analog*.mp3 $OUTDIR/sample.input.line_in.mp3
+        fi
+
+        if [ -n "$(find $OUTDIR -name sample.*input*usb*Hauppauge*.mp3 2>&-)" ]; then
+            mv $OUTDIR/sample.*input*usb*Hauppauge*.mp3 $OUTDIR/sample.input.TV_Tuner.mp3
+        fi
+
+        if [ -n "$(find $OUTDIR -name sample.*output*pci*analog*.mp3 2>&-)" ]; then
+            mv $OUTDIR/sample.*output*pci*analog*.mp3 $OUTDIR/sample.output.headphone_jack.mp3
+        fi
+
+        if [ -n "$(find $OUTDIR -name sample.*output*pci*hdmi*.mp3 2>&-)" ]; then
+            mv $OUTDIR/sample.*output*pci*hdmi*.mp3 $OUTDIR/sample.output.hdmi.mp3
+        fi
+
+        echo -n "Would you like to save the file? (y/n): "
+        read SAVE
+
+        SAVEy=$(echo $SAVE | tr '[:upper:]' '[:lower:]' | head -c 1)
+
+        if [ "$SAVEy" == "y" ]; then
+            save32
+            echo -e "You file is located in $SAVEDIR.\n"
+            echo -e "Options:
+            1) Input  - Tv Tuner
+            2) Input  - Line In Port
+            3) Output - HDMI
+            4) Output - Headset Port
+
+            Hit ANY key to skip playing.\n"
+            echo -n "Would you like to play any of the files? "
+            read PLAY
+
+            case $PLAY in
+                1) cvlc $SAVEDIR/sample.input.TV.Tuner*.mp3 --play-and-exit -q
+                    exit
+                    ;;
+                2) cvlc $SAVEDIR/sample.input.line_in*.mp3 --play-and-exit -q
+                    exit
+                    ;;
+                3) cvlc $SAVEDIR/sample.output.hdmi*.mp3 --play-and-exit -q
+                    exit
+                    ;;
+                4) cvlc $SAVEDIR/sample.output.headphone_jack*.mp3 --play-and-exit -q
+                    exit
+                    ;;
+                *) exit
+                    ;;
+            esac
+        else
+            cleanup32
+        fi
+
+    fi
+}
+
+if [[ $IPADDRESS =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
+then
+    start
+else
+    printhelp
+    exit 1
+fi

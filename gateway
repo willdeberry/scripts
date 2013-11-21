@@ -1,0 +1,13 @@
+#!/bin/bash
+
+for plc in $(cat ipaddress.txt); do
+    echo "-----------"
+    echo "Checking $plc..."
+    ssh -o ConnectTimeout=10 -q -oStrictHostKeyChecking=no -l root ${plc} exit
+    if [ $? != 0 ]; then
+        echo " * ${plc} is not responding to SSH"
+    else
+        echo " * ${plc}:"
+        ssh -oStrictHostKeyChecking=no -l root ${plc} RDC ipsettings STATIC ${plc} 255.255.252.0 10.108.0.1 10.108.0.20
+    fi
+done

@@ -1,0 +1,1 @@
+sudo mount -t cifs //10.1.1.235/GWNSoftware/ /mnt/GWNSoftware -o username=wdeberry,domain=ad,uid=will

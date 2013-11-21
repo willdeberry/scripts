@@ -1,0 +1,2 @@
+#!/bin/bash
+sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no $2 root@$1

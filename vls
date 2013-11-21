@@ -1,0 +1,1 @@
+sshpass -f ~/.apssh ssh -oStrictHostKeyChecking=no wdeberry@vls$2.$1.gwn

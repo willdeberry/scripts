@@ -1,0 +1,11 @@
+#!/bin/bash
+
+MOUNT=$(mount | grep -i storage)
+DIR="/mnt/storage"
+REMOTE="nas:/mnt/Storage/Public"
+
+if [ -z "$MOUNT" ]; then
+    sudo mount -t nfs -o nolock $REMOTE $DIR
+else
+    sudo umount $DIR
+fi

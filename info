@@ -1,0 +1,152 @@
+#!/bin/bash
+IP=${@: -1}
+
+function fetch {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    doFetch --all && RDC reconfigure_display && /etc/init.d/patientx restart
+
+EOFSSH
+}
+
+function reboot {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    RDC reboot
+
+EOFSSH
+}
+
+function patientx {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -t -t <<'EOFSSH'
+
+    /etc/init.d/patientx restart
+
+EOFSSH
+}
+
+function motd {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    helpme --motd
+
+EOFSSH
+}
+
+function ipaddress {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    YELLOW="$( echo -e "\e[33;01m" )"
+    PURPLE="$( echo -e "\e[35;01m" )"
+    PLAIN="$( echo -e "\e[0m" )"
+
+    DNS=$(cat /etc/resolv.conf | awk '{print $2}')
+    IP=$(cat /etc/conf.d/net | grep -i config | cut -f2 -d '"' | awk '{print $1}')
+    MASK=$(cat /etc/conf.d/net | grep -i config | cut -f2 -d '"' | awk '{print $3}')
+    GATEWAY=$(cat /etc/conf.d/net | grep -i routes | cut -f2 -d '"' | awk '{print $3}')
+
+    cat <<NETWORK
+${YELLOW}Network Information:${PLAIN}
+    ${PURPLE}IPAddress: ${YELLOW}$IP
+    ${PURPLE}Subnet: ${YELLOW}$MASK
+    ${PURPLE}DNS: ${YELLOW}$DNS
+    ${PURPLE}Gateway: ${YELLOW}$GATEWAY${PLAIN}
+NETWORK
+
+EOFSSH
+}
+
+function display {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    if [ -e "/opt/GWN/scripts/display/DisplayControl.sh" ]; then
+        /opt/GWN/scripts/display/DisplayControl.sh Info
+    else
+        queryProperties --display-control
+    fi
+
+EOFSSH
+}
+
+function config {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    if [ -e "/opt/GWN/conf/DisplayConfig.xml" ]; then
+        cat /opt/GWN/conf/DisplayConfig.xml
+    else
+        echo "PLC uses properties and not the displays XML"
+    fi
+
+EOFSSH
+}
+
+function edid {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    getedidinfo identity
+
+EOFSSH
+}
+
+function help {
+    echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
+
+    echo -e "Options:
+  -f, --fetch     Forces the PLC to manually fetch the newest displays XML and apply it via patient experience restart
+  -d, --display   Prints out the current display config
+  -r, --reboot    Reboots the PLC
+  -x, --restart   Restarts the patient experience
+  -m, --motd      Prints out the PLCs helpme prompt
+  -i, --ipaddress Displays all the PLCs network information
+  -c, --config    Displays the current display config used by the PLC
+  -e, --edid      Displays the EDID of the currently connected TV
+  -h, --help      Show this help message and exit"
+}
+
+for arg
+do
+    delim=""
+    case "$arg" in
+        --help) args="${args} -h ";;
+        --fetch) args="${args} -f ";;
+        --display) args="${args} -d ";;
+        --reboot) args="${args} -r ";;
+        --restart) args="${args} -x ";;
+        --motd) args="${args} -m ";;
+        --ipaddress) args="${args} -i ";;
+        --config) args="${args} -c ";;
+        --edid) args="${args} -e ";;
+        *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+        args="${args}${delim}${arg}${delim} ";;
+    esac
+done
+
+eval set -- $args
+    while getopts ":hfrxmidce?" option 2>/dev/null
+    do
+        case $option in
+            h) help
+                exit
+                ;;
+            f) fetch
+                ;;
+            r) reboot
+                ;;
+            x) patientx
+                ;;
+            m) motd
+                ;;
+            i) ipaddress
+                ;;
+            d) display
+                ;;
+            c) config
+                ;;
+            e) edid
+                ;;
+            *) echo $OPTARG is an unrecognized option;
+                help
+                exit
+                ;;
+        esac
+    done

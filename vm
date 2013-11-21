@@ -1,0 +1,12 @@
+#!/bin/bash
+STATUS=$(ps ax | grep -i "[W]indows XP")
+
+echo "$STATUS"
+
+if [ -n "$STATUS" ]; then
+    echo "shutdown"
+    vboxmanage controlvm "Windows XP" poweroff
+else
+    echo "start"
+    vboxmanage startvm "Windows XP"
+fi

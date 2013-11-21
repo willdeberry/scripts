@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# Detect displays, change resolutions and resize windows
+#
+LAPTOP_OUTPUT=LVDS1
+MONITOR_OUTPUT=VGA1
+MODE=`xrandr | grep "$MONITOR_OUTPUT connected" -c`
+SETUP=$(cat .monitors)
+MONITOR=/home/will/.monitors
+if [ "$MODE" == '1' -a "$SETUP" == "single" ]; then
+    #edit for your two monitor setup
+    xrandr --output LVDS1 --mode "1600x900" --primary --output VGA1 --mode "1920x1080" --right-of LVDS1
+    nitrogen --restore    #fix crashed wallpapers
+    echo "dual" > $MONITOR
+elif [ "$MODE" -ne '1' -a "$SETUP" == "dual" ]; then
+    #restore resulution
+    xrandr --auto
+    #fix window positions (hash this part out if your windows aren't getting weird positioning)
+        processes=`wmctrl -l`
+        pid=$(echo $processes | egrep -o '[0][x][0-9a-z]* [0]')
+        class=$(echo $pid | egrep -o '[0][x][0-9a-z]* ')
+        IFS=$'\n'     # Set the field separator
+        set $class    # Breaks the string into $1, $2, ...
+        i=0
+        for item    # A for loop by default loop through $1, $2, ...
+        do
+            wmctrl -i -r "$item" -e 0,0,100,-1,-1  #moves windows
+            ((i++))
+        done
+        nitrogen --restore    #fix crashed wallpapers
+        echo "single" > $MONITOR
+else
+    echo "Nothing to Change"
+fi

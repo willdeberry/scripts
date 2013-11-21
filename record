@@ -1,0 +1,113 @@
+#!/bin/bash
+
+
+function printhelp() {
+cat <<'EOF' >/dev/stderr
+RecordPLCAudio.sh ${IP_ADDRESS} ${LENGTH}
+    IP_ADDRESS: the IP address of the machine to use
+    LENGTH:     the length (in seconds) of the mp3 to record
+EOF
+}
+
+
+### process params
+
+IP=${1}
+LENGTH=${2}
+
+RMODE=default
+case "${3}" in
+	hdmi|HDMI)
+		RMODE=hdmi
+		;;
+	analog)
+		RMODE=analog
+		;;
+	default|"")
+		;;
+	*)
+		printhelp
+		exit 0
+		;;
+esac
+
+
+### try to connect to the machine
+sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${IP} "RMODE=${RMODE} LENGTH=${LENGTH} bash" <<'EOFSSH'
+
+PATH="$PATH:/opt/GWN/scripts/"
+
+### print connection success
+echo "connection success" > /dev/stderr
+
+### check to ensure that PX is running
+if [ "$(plcStatus.sh --get-status | head -1)" != "RUNNING" ]; then
+	echo "patient experience not running/ready"
+	exit 100
+fi
+
+### print the volume state
+OUTPUT=$(su - user <<EOF
+processSoundRequest status
+EOF
+)
+
+ISMUTE=$(awk '{print $2}' <<<$OUTPUT)
+VOLUME=$(awk '{print $1}' <<<$OUTPUT)
+
+if [ "${ISMUTE}" == "MUTED" ]; then
+	echo "volume: muted" > /dev/stderr
+	echo "nothing to record, quitting now" > /dev/stderr
+	exit 101
+else
+	echo "volume: $VOLUME" > /dev/stderr
+fi
+
+### determine the monitor we should be recording from
+if [ "${RMODE}" == "default" ]; then
+	if [ "$(persistRead /var/state/PLCState.db HDMI_AUDIO)" == "true" ]; then
+		if [ "$(persistRead /var/state/PLCState.db ANALOG_LINE_LOOP)" == "true" ]; then
+			RMODE=analog
+		else
+			RMODE=hdmi
+		fi
+	else
+		RMODE=analog
+	fi
+fi
+
+case "${RMODE}" in
+	analog)
+		su - user <<EOFEOF | grep name: | grep -v hdmi | grep stereo\.monitor | sed -e 's|^.*<\(.*\)>.*$|\1|' > /tmp/monitor.name
+pacmd list-sources
+EOFEOF
+		ADEVICE=$(cat /tmp/monitor.name)
+		;;
+	hdmi)
+		su - user <<EOFEOF | grep name: | grep hdmi | grep stereo\.monitor | sed -e 's|^.*<\(.*\)>.*$|\1|' > /tmp/monitor.name
+pacmd list-sources
+EOFEOF
+		;;
+esac
+
+### record the mp3
+echo "recording $LENGTH seconds of audio..." > /dev/stderr
+
+su - user <<EOFEOFEOF
+gst-launch-0.10 -e pulsesrc device="${ADEVICE}" ! audioconvert ! lamemp3enc target=1 bitrate=128 cbr=true ! filesink location=/tmp/out.mp3 >/dev/null 2>&1 &
+
+GSID=\$!
+sleep $LENGTH
+kill -2 \$GSID
+EOFEOFEOF
+
+### output result:
+echo "transmitting mp3" >> /dev/stderr
+cat /tmp/out.mp3
+
+### print success
+echo "all done!" >> /dev/stderr
+
+
+EOFSSH
+
