@@ -1,0 +1,45 @@
+#!/bin/bash
+
+PLCS_CHECKED=66
+PROBLEM_FILES=5
+
+REPORT=$(cat free_space.csv)
+QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | sort -n | tail -${PLCS_CHECKED} | awk '{print $3}')
+TEMP_PLC=/tmp/big_files.txt
+TEMP_PARSE=/tmp/parse.txt
+TEMP_FILE=/tmp/file.txt
+TEMP_LINES=/tmp/lines.txt
+
+# Cleanup temp files
+if [ -e $TEMP_FILE -a -e $TEMP_PARSE -a -e $TEMP_LINES -a -e $TEMP_PLC ]; then
+    rm -rf $TEMP_FILE
+    rm -rf $TEMP_PARSE
+    rm -rf $TEMP_LINES
+    rm -rf $TEMP_PLC
+fi
+
+# Log in and get top x big files (determined by PROBLEM_FILES)
+for plcs in ${QUERY}; do
+    echo "Checking $plcs..."
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} du -a /* 2>/dev/null | sort -n | tail -${PROBLEM_FILES} &>> $TEMP_PLC
+done
+
+# Take the list of big files provided above and organize it
+# Create a list of only unique items and total how many instances of each file
+# Get average size of the files found and present in size=MB
+PARSE=$(cat "$TEMP_PLC" | awk '{print $2}' | sort -n | uniq)
+for size in $PARSE; do
+    SUM=0
+    TOTAL=$(cat $TEMP_PLC | grep $size | awk '{print $1}')
+    LINES=$(cat $TEMP_PLC | grep $size | wc -l)
+    for values in $TOTAL; do
+        SUM=`expr $SUM + $values`
+    done
+    AVERAGE=`expr $SUM / $LINES`
+    echo "$AVERAGE" | awk '{GB = $1 / 1024 ; print GB " MB"}' >> $TEMP_FILE
+    echo "$LINES" >> $TEMP_LINES
+done
+
+echo "$PARSE" >> $TEMP_PARSE
+echo "Size | File/Folder Name | # of Entries"
+paste -d ':>' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | sed 's/:/: /g' | sed 's/>/ /g' | sort -n
