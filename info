@@ -88,6 +88,14 @@ function edid {
 EOFSSH
 }
 
+function audio {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    cat /opt/GWN/conf/audio.conf
+
+EOFSSH
+}
+
 function help {
     echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
 
@@ -99,6 +107,7 @@ function help {
   -m, --motd      Prints out the PLCs helpme prompt
   -i, --ipaddress Displays all the PLCs network information
   -c, --config    Displays the current display config used by the PLC
+  -a, --audio     Prints out the current audio config
   -e, --edid      Displays the EDID of the currently connected TV
   -h, --help      Show this help message and exit"
 }
@@ -115,6 +124,7 @@ do
         --motd) args="${args} -m ";;
         --ipaddress) args="${args} -i ";;
         --config) args="${args} -c ";;
+        --audio) args="${args} -a ";;
         --edid) args="${args} -e ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
@@ -141,6 +151,8 @@ eval set -- $args
             d) display
                 ;;
             c) config
+                ;;
+            a) audio
                 ;;
             e) edid
                 ;;
