@@ -18,7 +18,7 @@ EOFSSH
 }
 
 function patientx {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -t -t <<'EOFSSH'
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
 
     RDC sanitize
 
@@ -88,6 +88,22 @@ function edid {
 EOFSSH
 }
 
+function audio {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    cat /opt/GWN/conf/audio.conf
+
+EOFSSH
+}
+
+function resolution {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    xvidtune -show
+
+EOFSSH
+}
+
 function help {
     echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
 
@@ -99,7 +115,9 @@ function help {
   -m, --motd      Prints out the PLCs helpme prompt
   -i, --ipaddress Displays all the PLCs network information
   -c, --config    Displays the current display config used by the PLC
+  -a, --audio     Prints out the current audio config
   -e, --edid      Displays the EDID of the currently connected TV
+  -z, --rez       Displays the current resolution of the PLC
   -h, --help      Show this help message and exit"
 }
 
@@ -115,14 +133,16 @@ do
         --motd) args="${args} -m ";;
         --ipaddress) args="${args} -i ";;
         --config) args="${args} -c ";;
+        --audio) args="${args} -a ";;
         --edid) args="${args} -e ";;
+        --rez) args="${args} -z ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hfrxmidce?" option 2>/dev/null
+    while getopts ":hfrxmidceaz?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -142,7 +162,11 @@ eval set -- $args
                 ;;
             c) config
                 ;;
+            a) audio
+                ;;
             e) edid
+                ;;
+            z) resolution
                 ;;
             *) echo $OPTARG is an unrecognized option;
                 help
