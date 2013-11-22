@@ -6,7 +6,7 @@ LAPTOP_OUTPUT=LVDS1
 MONITOR_OUTPUT=VGA1
 MODE=`xrandr | grep "$MONITOR_OUTPUT connected" -c`
 SETUP=$(cat .monitors)
-MONITOR=/home/will/.monitors
+MONITOR=/home/${USER}/.monitors
 if [ "$MODE" == '1' -a "$SETUP" == "single" ]; then
     #edit for your two monitor setup
     xrandr --output LVDS1 --mode "1600x900" --primary --output VGA1 --mode "1920x1080" --right-of LVDS1
