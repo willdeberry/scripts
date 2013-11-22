@@ -20,7 +20,7 @@ EOFSSH
 function patientx {
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -t -t <<'EOFSSH'
 
-    /etc/init.d/patientx restart
+    RDC sanitize
 
 EOFSSH
 }
