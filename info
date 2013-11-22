@@ -18,7 +18,7 @@ EOFSSH
 }
 
 function patientx {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -t -t <<'EOFSSH'
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
 
     RDC sanitize
 
