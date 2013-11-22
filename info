@@ -142,7 +142,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hfrxmidce?" option 2>/dev/null
+    while getopts ":hfrxmidceaz?" option 2>/dev/null
     do
         case $option in
             h) help
