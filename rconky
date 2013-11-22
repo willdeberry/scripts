@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 SCRIPTS=/home/$USER/.config/conky
 
 if [ -n "$(ps ax | grep -i '[c]onky' | grep -v rconky)" ]; then
