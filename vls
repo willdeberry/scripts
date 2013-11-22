@@ -1,1 +1,13 @@
-sshpass -f ~/.apssh ssh -oStrictHostKeyChecking=no wdeberry@vls$2.$1.gwn
+#!/bin/bash
+
+if [ "$USER" == "will" ]; then
+    UN=wdeberry
+elif
+    [ "$USER" == "rob" ]; then
+    UN=rob
+else
+    echo "Please type your Username: "
+    read UN
+fi
+
+sshpass -f ~/.apssh ssh -oStrictHostKeyChecking=no ${UN}@vls$2.$1.gwn
