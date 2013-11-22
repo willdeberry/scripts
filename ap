@@ -4,7 +4,7 @@ if [ "$USER" == "will" ]; then
     UN=wdeberry
 elif
     [ "$USER" == "rob" ]; then
-    UN=rglass`
+    UN=rglass
 else
     echo "Please type your Username: "
     read UN
