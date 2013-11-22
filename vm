@@ -1,5 +1,4 @@
 #!/bin/bash
-# Get list of running VMs
 
 function controlWinXP {
     VM=$(ps ax | grep -i "[W]indows XP")
