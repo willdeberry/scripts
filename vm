@@ -1,9 +1,8 @@
-#!/bin/bash -x
+#!/bin/bash
 # Get list of running VMs
 
 function controlWinXP {
-    proc="[W]indows XP"
-    VM=$(ps ax | grep -i "$proc")
+    VM=$(ps ax | grep -i "[W]indows XP")
     if [ -n "$VM" ]; then
         echo "shutdown"
         vboxmanage controlvm "Windows XP" poweroff
@@ -15,8 +14,7 @@ function controlWinXP {
 
 
 function controlMalXP {
-    proc="[M]alXP"
-    VM=$(ps ax | grep -i "$proc")
+    VM=$(ps ax | grep -i "[M]alXP")
     if [ -n "$VM" ]; then
         echo "shutdown"
         vboxmanage controlvm "MalXP" poweroff
@@ -27,8 +25,7 @@ function controlMalXP {
 }
 
 function controlWin7 {
-    proc="[W]in7"
-    VM=$(ps ax | grep -i "$proc")
+    VM=$(ps ax | grep -i "[W]in7")
     if [ -n "$VM" ]; then
         echo "shutdown"
         vboxmanage controlvm "Win7" poweroff
