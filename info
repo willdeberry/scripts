@@ -96,6 +96,14 @@ function audio {
 EOFSSH
 }
 
+function resolution {
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+
+    xvidtune -show
+
+EOFSSH
+}
+
 function help {
     echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
 
@@ -109,6 +117,7 @@ function help {
   -c, --config    Displays the current display config used by the PLC
   -a, --audio     Prints out the current audio config
   -e, --edid      Displays the EDID of the currently connected TV
+  -z, --rez       Displays the current resolution of the PLC
   -h, --help      Show this help message and exit"
 }
 
@@ -126,6 +135,7 @@ do
         --config) args="${args} -c ";;
         --audio) args="${args} -a ";;
         --edid) args="${args} -e ";;
+        --rez) args="${args} -z ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
@@ -155,6 +165,8 @@ eval set -- $args
             a) audio
                 ;;
             e) edid
+                ;;
+            z) resolution
                 ;;
             *) echo $OPTARG is an unrecognized option;
                 help
