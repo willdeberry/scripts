@@ -1,12 +1,54 @@
-#!/bin/bash
-STATUS=$(ps ax | grep -i "[W]indows XP")
+#!/bin/bash -x
+# Get list of running VMs
 
-echo "$STATUS"
+function controlWinXP {
+    proc="[W]indows XP"
+    VM=$(ps ax | grep -i "$proc")
+    if [ -n "$VM" ]; then
+        echo "shutdown"
+        vboxmanage controlvm "Windows XP" poweroff
+    else
+        echo "start"
+        vboxmanage startvm "Windows XP"
+    fi
+}
 
-if [ -n "$STATUS" ]; then
-    echo "shutdown"
-    vboxmanage controlvm "Windows XP" poweroff
+
+function controlMalXP {
+    proc="[M]alXP"
+    VM=$(ps ax | grep -i "$proc")
+    if [ -n "$VM" ]; then
+        echo "shutdown"
+        vboxmanage controlvm "MalXP" poweroff
+    else
+        echo "start"
+        vboxmanage startvm "MalXP"
+    fi
+}
+
+function controlWin7 {
+    proc="[W]in7"
+    VM=$(ps ax | grep -i "$proc")
+    if [ -n "$VM" ]; then
+        echo "shutdown"
+        vboxmanage controlvm "Win7" poweroff
+    else
+        echo "start"
+        vboxmanage startvm "Win7"
+    fi
+}
+
+if [ -z "$1" ]; then
+    controlWinXP
 else
-    echo "start"
-    vboxmanage startvm "Windows XP"
+    case $1 in   
+        M)
+            controlMalXP
+            exit
+            ;;
+        7)
+            controlWin7
+            exit
+            ;;
+    esac
 fi
