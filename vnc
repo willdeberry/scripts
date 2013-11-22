@@ -1,1 +1,1 @@
-vncviewer -compresslevel 8 -bgr233 -passwd /home/will/.vnc/passwd $1
+vncviewer -compresslevel 8 -bgr233 -passwd /home/${USER}/.vnc/passwd $1
