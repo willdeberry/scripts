@@ -4,22 +4,17 @@
 function controlWinXP {
     VM=$(ps ax | grep -i "[W]indows XP")
     if [ -n "$VM" ]; then
-        echo "shutdown"
         vboxmanage controlvm "Windows XP" poweroff
     else
-        echo "start"
         vboxmanage startvm "Windows XP"
     fi
 }
 
-
 function controlMalXP {
     VM=$(ps ax | grep -i "[M]alXP")
     if [ -n "$VM" ]; then
-        echo "shutdown"
         vboxmanage controlvm "MalXP" poweroff
     else
-        echo "start"
         vboxmanage startvm "MalXP"
     fi
 }
@@ -27,10 +22,8 @@ function controlMalXP {
 function controlWin7 {
     VM=$(ps ax | grep -i "[W]in7")
     if [ -n "$VM" ]; then
-        echo "shutdown"
         vboxmanage controlvm "Win7" poweroff
     else
-        echo "start"
         vboxmanage startvm "Win7"
     fi
 }
