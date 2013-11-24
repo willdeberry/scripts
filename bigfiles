@@ -32,7 +32,7 @@ fi
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
     echo "Checking $plcs..."
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} du -a /* 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $TEMP_PLC
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $TEMP_PLC
 done
 
 # Take the list of big files provided above and organize it
