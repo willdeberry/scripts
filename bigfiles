@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -x
+trap read debug
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
 if [ -z "${1}" ]; then
@@ -8,14 +9,14 @@ else
 fi
 
 # How many top offenders to look for, by default it find the top five big files/folders
-if [ -n "${2}" ]; then
-    TOP_FILES=${2}
-else
+if [ -z "${2}" ]; then
     TOP_FILES=5
+else
+    TOP_FILES=${2}
 fi
 
 REPORT=$(cat free_space.csv)
-QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>="${PERCENT}"' | sort -n | awk '{print $3}')
+QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>=80' | sort -n | awk '{print $3}')
 TEMP_PLC=/tmp/big_files.txt
 TEMP_PARSE=/tmp/parse.txt
 TEMP_FILE=/tmp/file.txt
