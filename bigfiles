@@ -1,10 +1,21 @@
 #!/bin/bash
 
-PLCS_CHECKED=66
-PROBLEM_FILES=5
+# Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
+if [ -z ${1} ]; then
+    PERCENT=50
+else
+    PERCENT=${1}
+fi
+
+# How many top offenders to look for, by default it find the top five big files/folders
+if [ ${2} -gt 0 ]; then
+    TOP_FILES=${2}
+else
+    TOP_FILES=5
+fi
 
 REPORT=$(cat free_space.csv)
-QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | sort -n | tail -${PLCS_CHECKED} | awk '{print $3}')
+QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>=${PERCENT}' | sort -n)
 TEMP_PLC=/tmp/big_files.txt
 TEMP_PARSE=/tmp/parse.txt
 TEMP_FILE=/tmp/file.txt
@@ -18,10 +29,10 @@ if [ -e $TEMP_FILE -a -e $TEMP_PARSE -a -e $TEMP_LINES -a -e $TEMP_PLC ]; then
     rm -rf $TEMP_PLC
 fi
 
-# Log in and get top x big files (determined by PROBLEM_FILES)
+# Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
     echo "Checking $plcs..."
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} du -a /* 2>/dev/null | sort -n | tail -${PROBLEM_FILES} &>> $TEMP_PLC
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} du -a /* 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $TEMP_PLC
 done
 
 # Take the list of big files provided above and organize it
