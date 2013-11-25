@@ -1,5 +1,4 @@
-#!/bin/bash -x
-trap read debug
+#!/bin/bash
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
 if [ -z "${1}" ]; then
