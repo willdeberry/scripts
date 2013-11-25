@@ -16,7 +16,7 @@ else
 fi
 
 REPORT=$(cat free_space.csv)
-QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>=80' | sort -n | awk '{print $3}')
+QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
 TEMP_PLC=/tmp/big_files.txt
 TEMP_PARSE=/tmp/parse.txt
 TEMP_FILE=/tmp/file.txt
