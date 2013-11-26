@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
+# Account for if a first arguement exist and if it is a number
 if [ -n "${1}" ] && [[ ${1} != *[!0-9]* ]]; then
     PERCENT=${1}
 else
@@ -8,6 +9,7 @@ else
 fi
 
 # How many top offenders to look for, by default it find the top five big files/folders
+# Account for if a second arguement exist and if it is a number
 if [ -n "${2}" ] && [[ ${2} != *[!0-9]* ]]; then
     TOP_FILES=${2}
 else
@@ -15,8 +17,14 @@ else
 fi
 
 REPORT=$(cat free_space.csv)
+
+#Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
 QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
+
+# REBOOT_PLC will always be the last arguement provided
 REBOOT_PLC=$BASH_ARGV
+
+# Declare where the temp files will be stored
 TEMP_PLC=/tmp/big_files.txt
 TEMP_PARSE=/tmp/parse.txt
 TEMP_FILE=/tmp/file.txt
@@ -56,8 +64,10 @@ for size in $PARSE; do
     echo "$LINES" >> $TEMP_LINES
 done
 
+# Display the results to the user in a nicely organzied fashion
 echo "$PARSE" >> $TEMP_PARSE
 echo "Size | File/Folder Name | # of Entries"
 paste -d ':>' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | sed 's/:/: /g' | sed 's/>/ /g' | sort -n
 
+# Remove temp files
 cleanup &>/dev/null
