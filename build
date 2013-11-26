@@ -38,36 +38,35 @@ function build-all {
     rm .build_list
 }
 
+function die {
+    echo "resume: build -r | abort build -k"
+    exit 0
+}
+
+function head {
+    BRANCH=$(grep "platform_manifest" .repo/manifest.xml | awk -F'"' '{print $8}')
+    OUR_HEAD=$(git rev-parse HEAD)
+    THEIR_HEAD=$(git rev-parse aokp/${BRANCH})
+
+    if [ "${OUR_HEAD}" == "${THEIR_HEAD}" ]; then
+        echo "Cherry-pick was not cleanly merged, please addres..."
+        die
+    fi
+}
+
+function resume {
+    pick
+}
+
+function kill {
+    exit 0
+}
+
 function pick {
     . build/envsetup.sh
     cd frameworks/base
-    pstest 13382/1
-    pstest 13402/1
-    pstest 13403/1
     cd -; cd packages/apps/ROMControl
-    pstest 13385/1
-    cd -; cd packages/apps/Mms
-    pstest 13378/1
-    cd -; cd packages/apps/ContactsCommon
-    pstest 13379/1
-    cd -; cd packages/apps/Contacts
-    pstest 13380/1
-    pstest 13404/1
-    pstest 13405/1
-    pstest 13406/1
-    pstest 13407/1
-    pstest 13408/1
-    pstest 13409/1
-    pstest 13410/1
-    pstest 13411/1
-    pstest 13412/1
-    pstest 13413/1
     cd -; cd packages/apps/Settings
-    pstest 13381/1
-    pstest 13396/1
-    pstest 13397/1
-    pstest 13398/1
-    pstest 13399/1
     cd -
 }
 
