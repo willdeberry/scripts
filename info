@@ -80,6 +80,12 @@ function config {
 EOFSSH
 }
 
+function getLogs {
+    sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/$IP_messages <<'EOFSSH'
+  
+EOFSSH
+}
+
 function edid {
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
 
@@ -110,6 +116,7 @@ function help {
     echo -e "Options:
   -f, --fetch     Forces the PLC to manually fetch the newest displays XML and apply it via patient experience restart
   -d, --display   Prints out the current display config
+  -g, --getlogs   downloads the current /var/log/messages file to ~/logs/
   -r, --reboot    Reboots the PLC
   -x, --restart   Restarts the patient experience
   -m, --motd      Prints out the PLCs helpme prompt
@@ -127,6 +134,7 @@ do
     case "$arg" in
         --help) args="${args} -h ";;
         --fetch) args="${args} -f ";;
+        --getlogs) args="${args} -g ";;
         --display) args="${args} -d ";;
         --reboot) args="${args} -r ";;
         --restart) args="${args} -x ";;
@@ -142,7 +150,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hfrxmidceaz?" option 2>/dev/null
+    while getopts ":hfgrxmidceaz?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -161,6 +169,8 @@ eval set -- $args
             d) display
                 ;;
             c) config
+                ;;
+            g) getLogs
                 ;;
             a) audio
                 ;;
