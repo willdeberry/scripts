@@ -23,12 +23,12 @@ TEMP_FILE=/tmp/file.txt
 TEMP_LINES=/tmp/lines.txt
 
 # Cleanup temp files
-if [ -e $TEMP_FILE -a -e $TEMP_PARSE -a -e $TEMP_LINES -a -e $TEMP_PLC ]; then
+function cleanup {
     rm -rf $TEMP_FILE
     rm -rf $TEMP_PARSE
     rm -rf $TEMP_LINES
     rm -rf $TEMP_PLC
-fi
+}
 
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
@@ -59,3 +59,5 @@ done
 echo "$PARSE" >> $TEMP_PARSE
 echo "Size | File/Folder Name | # of Entries"
 paste -d ':>' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | sed 's/:/: /g' | sed 's/>/ /g' | sort -n
+
+cleanup &>/dev/null
