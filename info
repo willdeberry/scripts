@@ -81,6 +81,10 @@ EOFSSH
 }
 
 function getLogs {
+    if [ ! -d ~/logs ]; then
+      mkdir ~/logs
+    fi
+    
     sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/$IP_messages <<'EOFSSH'
   
 EOFSSH
