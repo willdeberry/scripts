@@ -1,21 +1,22 @@
 #!/bin/bash
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
-if [ -z "${1}" ]; then
-    PERCENT=50
-else
+if [ -n "${1}" ] && [[ ${1} != *[!0-9]* ]]; then
     PERCENT=${1}
+else
+    PERCENT=50
 fi
 
 # How many top offenders to look for, by default it find the top five big files/folders
-if [ -z "${2}" ]; then
-    TOP_FILES=5
-else
+if [ -n "${2}" ] && [[ ${2} != *[!0-9]* ]]; then
     TOP_FILES=${2}
+else
+    TOP_FILES=5
 fi
 
 REPORT=$(cat free_space.csv)
 QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
+REBOOT_PLC=$BASH_ARGV
 TEMP_PLC=/tmp/big_files.txt
 TEMP_PARSE=/tmp/parse.txt
 TEMP_FILE=/tmp/file.txt
@@ -31,8 +32,12 @@ fi
 
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
-    echo "Checking $plcs..."
+    echo "Checking ${plcs}..."
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $TEMP_PLC
+    if [ "${REBOOT_PLC}" == "reboot" ]; then
+        echo "Rebooting ${plcs}..."
+        info -x ${plcs}
+    fi
 done
 
 # Take the list of big files provided above and organize it
