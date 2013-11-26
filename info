@@ -73,7 +73,7 @@ function config {
 
     if [ -e "/opt/GWN/conf/DisplayConfig.xml" ]; then
         cat /opt/GWN/conf/DisplayConfig.xml
-    else
+  else
         echo "PLC uses properties and not the displays XML"
     fi
 
@@ -85,9 +85,10 @@ function getLogs {
       mkdir ~/logs
     fi
     
-    sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/$IP_messages <<'EOFSSH'
-  
-EOFSSH
+    sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/ 
+    mv ~/logs/messages ~/logs/${IP}_messages.log
+
+    
 }
 
 function edid {
