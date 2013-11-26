@@ -85,8 +85,12 @@ function getLogs {
       mkdir ~/logs
     fi
     
+    echo "Getting log from $IP"
     sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/ 
-    mv ~/logs/messages ~/logs/${IP}_messages.log
+    if [ -f ~/logs/messages ]; then
+      mv ~/logs/messages ~/logs/${IP}_messages.log
+      echo "File saved as ~/logs/${IP}_messages.log"
+    fi
 
     
 }
