@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Script used to covert another script the relys on sshpass
+# and to remove any references to sshpass to make the script
+# more universally compatible
+#
+
+FILE="${1}"
+CONVERTED="${1}_converted"
+
+cp $FILE $CONVERTED
+sed -i 's|sshpass -f ~/.plcssh ||g' $CONVERTED
