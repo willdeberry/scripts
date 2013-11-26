@@ -71,7 +71,8 @@ function help {
   -c, --config    Displays the current display config used by the PLC
   -d, --display   Prints out the current display config
   -e, --edid      Displays the EDID of the currently connected TV
-  -f, --fetch     Forces the PLC to manually fetch the newest displays XML and apply it via patient experience restart
+  -f, --fetch     Forces the PLC to manually fetch the newest displays
+                  XML and apply it via patient experience restart
   -g, --getlogs   downloads the current /var/log/messages file to ~/logs/
   -h, --help      Show this help message and exit
   -i, --ipaddress Displays all the PLCs network information
