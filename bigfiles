@@ -20,15 +20,17 @@ REPORT=$(cat free_space.csv)
 
 #Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
 QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
+PERC=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $1" " $3}')
 
 # REBOOT_PLC will always be the last arguement provided
 REBOOT_PLC=$BASH_ARGV
 
 # Declare where the temp files will be stored
-FILES_FOUND=/tmp/big_files.txt
-FILE_NAMES=/tmp/parse.txt
-FILE_SIZE=/tmp/file.txt
-AMOUNT_FOUND=/tmp/lines.txt
+FILES_FOUND=/tmp/files_found.txt
+FILE_NAMES=/tmp/file_names.txt
+FILE_SIZE=/tmp/file_size.txt
+AMOUNT_FOUND=/tmp/amount_found.txt
+PLC_FILES=/tmp/plc_files.txt
 
 # Cleanup temp files
 function cleanup {
@@ -36,12 +38,17 @@ function cleanup {
     rm -rf $FILE_NAMES
     rm -rf $AMOUNT_FOUND
     rm -rf $FILES_FOUND
+    rm -rf $PLC_FILES
 }
 
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
     echo "Checking ${plcs}..."
+    PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
+    echo "${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
+    cat ${FILES_FOUND} | tail -${TOP_FILES} &>> $PLC_FILES
+    echo "" >> $PLC_FILES
     if [ "${REBOOT_PLC}" == "reboot" ]; then
         echo "Rebooting ${plcs}..."
         info -x ${plcs}
@@ -69,5 +76,18 @@ echo "$PARSE" >> $FILE_NAMES
 echo "Average Size of File | File/Folder Name | # of PLCs File was Found"
 paste -d ':' "$FILE_SIZE" "$FILE_NAMES" "$AMOUNT_FOUND" | awk -F':' '{print $1": "$2" - "$3" PLC(s) found with file"}' | sort -n
 
+function save {
+    cp ${PLC_FILES} ~/.
+}
+
+while true; do
+    read -p "Do you wish to save individual PLC file info? " yn
+    case $yn in
+        [Yy]* ) save; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 # Remove temp files
-#cleanup &>/dev/null
+cleanup &>/dev/null
