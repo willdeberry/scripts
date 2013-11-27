@@ -25,23 +25,23 @@ QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 
 REBOOT_PLC=$BASH_ARGV
 
 # Declare where the temp files will be stored
-TEMP_PLC=/tmp/big_files.txt
-TEMP_PARSE=/tmp/parse.txt
-TEMP_FILE=/tmp/file.txt
-TEMP_LINES=/tmp/lines.txt
+FILES_FOUND=/tmp/big_files.txt
+FILE_NAMES=/tmp/parse.txt
+FILE_SIZE=/tmp/file.txt
+AMOUNT_FOUND=/tmp/lines.txt
 
 # Cleanup temp files
 function cleanup {
-    rm -rf $TEMP_FILE
-    rm -rf $TEMP_PARSE
-    rm -rf $TEMP_LINES
-    rm -rf $TEMP_PLC
+    rm -rf $FILE_SIZE
+    rm -rf $FILE_NAMES
+    rm -rf $AMOUNT_FOUND
+    rm -rf $FILES_FOUND
 }
 
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${QUERY}; do
     echo "Checking ${plcs}..."
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $TEMP_PLC
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
     if [ "${REBOOT_PLC}" == "reboot" ]; then
         echo "Rebooting ${plcs}..."
         info -x ${plcs}
@@ -51,23 +51,23 @@ done
 # Take the list of big files provided above and organize it
 # Create a list of only unique items and total how many instances of each file
 # Get average size of the files found and present in size=MB
-PARSE=$(cat "$TEMP_PLC" | awk '{print $2}' | sort -n | uniq)
+PARSE=$(cat "$FILES_FOUND" | awk '{print $2}' | sort -n | uniq)
 for size in $PARSE; do
     SUM=0
-    TOTAL=$(cat $TEMP_PLC | grep $size | awk '{print $1}')
-    LINES=$(cat $TEMP_PLC | grep $size | wc -l)
+    TOTAL=$(cat $FILES_FOUND | grep $size | awk '{print $1}')
+    LINES=$(cat $FILES_FOUND | grep $size | wc -l)
     for values in $TOTAL; do
         SUM=`expr $SUM + $values`
     done
     AVERAGE=`expr $SUM / $LINES`
-    echo "$AVERAGE" | awk '{GB = $1 / 1024 ; print GB " MB"}' >> $TEMP_FILE
-    echo "$LINES" >> $TEMP_LINES
+    echo "$AVERAGE" | awk '{GB = $1 / 1024 ; print GB " MB"}' >> $FILE_SIZE
+    echo "$LINES" >> $AMOUNT_FOUND
 done
 
 # Display the results to the user in a nicely organzied fashion
-echo "$PARSE" >> $TEMP_PARSE
+echo "$PARSE" >> $FILE_NAMES
 echo "Average Size of File | File/Folder Name | # of PLCs File was Found"
-paste -d ':' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | awk -F':' '{print $1": "$2" - "$3" PLC(s) found with file"}' | sort -n
+paste -d ':' "$FILE_SIZE" "$FILE_NAMES" "$AMOUNT_FOUND" | awk -F':' '{print $1": "$2" - "$3" PLC(s) found with file"}' | sort -n
 
 # Remove temp files
-cleanup &>/dev/null
+#cleanup &>/dev/null
