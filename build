@@ -1,7 +1,6 @@
-#!/bin/bash
-
 BUILD_DIR=$(pwd)
-VENDOR=$BUILD_DIR/vendor/aokp
+VENDOR=${BUILD_DIR}/vendor/aokp
+MANIFEST=${BUILD_DIR}/.repo/manifest.xml
 
 for i in $@; do :; done
 DEVICE=$i
@@ -39,27 +38,22 @@ function build-all {
 }
 
 function die {
-    echo "resume: build -r | abort build -k"
     exit 0
 }
 
-function head {
-    BRANCH=$(grep "platform_manifest" .repo/manifest.xml | awk -F'"' '{print $8}')
+function check {
+    BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
     OUR_HEAD=$(git rev-parse HEAD)
     THEIR_HEAD=$(git rev-parse aokp/${BRANCH})
+    GIT_STATUS=$(git status | grep nothing)
 
     if [ "${OUR_HEAD}" == "${THEIR_HEAD}" ]; then
         echo "Cherry-pick was not cleanly merged, please addres..."
+        echo "Failed to pick clean in $pwd"
         die
+    elif [ -z "${GIT_STATUS}" ]; then
+        git commit -a
     fi
-}
-
-function resume {
-    pick
-}
-
-function kill {
-    exit 0
 }
 
 function pick {
@@ -81,7 +75,8 @@ function help {
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
   -m, --mmm       Compiles the specified apk individually. Requires APK be provided
-  -p, --pick      Cherry-pick the specific changes"
+  -p, --pick      Cherry-pick the specific changes
+  -r, --resume    Resume after a failed Cherry-pick"
 }
 
 function clean {
@@ -118,13 +113,14 @@ do
         --all) args="${args} -a ";;
         --mmm) args="${args} -m ";;
         --pick) args="${args} -p ";;
+        --resume) args="${args} -r ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hspclam:b:?" option 2>/dev/null
+    while getopts ":hsprclam:b:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -143,6 +139,8 @@ eval set -- $args
             m) apk
                 ;;
             p) pick
+                ;;
+            r) resume
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
