@@ -34,11 +34,7 @@ PLC_FILES=/tmp/plc_files.txt
 
 # Cleanup temp files
 function cleanup {
-    rm -rf $FILE_SIZE
-    rm -rf $FILE_NAMES
-    rm -rf $AMOUNT_FOUND
-    rm -rf $FILES_FOUND
-    rm -rf $PLC_FILES
+    rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES
 }
 
 # Log in and get top x big files (determined by TOP_FILES)
@@ -46,9 +42,11 @@ for plcs in ${QUERY}; do
     echo "Checking ${plcs}..."
     PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
     echo "${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
+    echo "" >> $PLC_FILES
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
     cat ${FILES_FOUND} | tail -${TOP_FILES} &>> $PLC_FILES
-    echo "" >> $PLC_FILES
+    # Determine if we should reboot the PLCs while we are logged in
+    # This requires the info script to work
     if [ "${REBOOT_PLC}" == "reboot" ]; then
         echo "Rebooting ${plcs}..."
         info -x ${plcs}
