@@ -56,11 +56,7 @@ function getLogs {
     fi
 
     echo "Getting log from $IP"
-    sshpass -f ~/.plcssh scp -oStrictHostKeyChecking=no root@$IP:/var/log/messages ~/logs/ 
-    if [ -f ~/logs/messages ]; then
-      mv ~/logs/messages ~/logs/${IP}_messages.log
-      echo "File saved as ~/logs/${IP}_messages.log"
-    fi    
+    sshpass -f ~/.plcssh scp -oStrictHostKeyChecking=no root@$IP:/var/log/messages ~/logs/${IP}_messages.log
 }
 
 function help {
