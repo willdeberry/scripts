@@ -66,8 +66,8 @@ done
 
 # Display the results to the user in a nicely organzied fashion
 echo "$PARSE" >> $TEMP_PARSE
-echo "Size | File/Folder Name | # of Entries"
-paste -d ':>' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | sed 's/:/: /g' | sed 's/>/ /g' | sort -n
+echo "Average Size of File | File/Folder Name | # of PLCs File was Found"
+paste -d ':' "$TEMP_FILE" "$TEMP_PARSE" "$TEMP_LINES" | awk -F':' '{print $1": "$2" - "$3" PLC(s) found with file"}' | sort -n
 
 # Remove temp files
 cleanup &>/dev/null
