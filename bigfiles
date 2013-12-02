@@ -51,6 +51,7 @@ function cleanup {
 
 function save {
     cp ${PLC_FILES} ~/.
+    cleanup
     exit
 }
 
