@@ -58,8 +58,7 @@ function save {
 for plcs in ${PLCS}; do
     echo "Checking ${plcs}..."
     PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
-    echo "" >> $PLC_FILES
-    echo "${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
+    echo -e "\n${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
     sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
     cat ${FILES_FOUND} | tail -${TOP_FILES} &>> $PLC_FILES
     # Determine if we should reboot the PLCs while we are logged in
