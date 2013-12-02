@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Cleanup temp files
-function cleanup {
+cleanup() {
     rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES $REPORT_RESULTS
 }
 
-function save {
+save() {
     cp ${PLC_FILES} ~/.
     cleanup
     exit
