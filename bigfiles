@@ -46,7 +46,7 @@ PERC=$(echo "$ROOT_QUERY" | awk '{print $1" " $3}')
 
 # Cleanup temp files
 function cleanup {
-    rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES
+    rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES $REPORT_RESULTS
 }
 
 function save {
