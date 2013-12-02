@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Cleanup temp files
+function cleanup {
+    rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES $REPORT_RESULTS
+}
+
+function save {
+    cp ${PLC_FILES} ~/.
+    cleanup
+    exit
+}
+
+control_c() {
+    cleanup
+    stty echo
+    exit $?
+}
+
+# trap keyboard interrupt (control-c)
+trap control_c SIGINT
+
 # Declare where the temp files will be stored
 FILES_FOUND=/tmp/files_found.txt
 FILE_NAMES=/tmp/file_names.txt
@@ -43,17 +63,6 @@ ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{prin
 PLCS=$(echo "$ROOT_QUERY" | awk '{print $3}')
 # List of Percent full per IP address
 PERC=$(echo "$ROOT_QUERY" | awk '{print $1" " $3}')
-
-# Cleanup temp files
-function cleanup {
-    rm -rf $FILE_SIZE $FILE_NAMES $AMOUNT_FOUND $FILES_FOUND $PLC_FILES $REPORT_RESULTS
-}
-
-function save {
-    cp ${PLC_FILES} ~/.
-    cleanup
-    exit
-}
 
 # Log in and get top x big files (determined by TOP_FILES)
 for plcs in ${PLCS}; do
