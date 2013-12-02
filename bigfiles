@@ -6,6 +6,7 @@ FILE_NAMES=/tmp/file_names.txt
 FILE_SIZE=/tmp/file_size.txt
 AMOUNT_FOUND=/tmp/amount_found.txt
 PLC_FILES=/tmp/plc_files.txt
+REPORT_RESULTS=/tmp/results.csv
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
 # Account for if a first arguement exist and if it is a number
@@ -23,9 +24,18 @@ else
     TOP_FILES=5
 fi
 
+echo "Please provide your report code (ie: hYqEmd) "
+read code
+if [ -z "$code" ]; then
+    echo "No code provided...exiting"
+    exit 0
+fi
+
+scp services.hq:/tmp/plc_report_${code}/results.csv $REPORT_RESULTS
+
 # REBOOT_PLC will always be the last arguement provided
 REBOOT_PLC=$BASH_ARGV
-REPORT=$(cat free_space.csv)
+REPORT=$(cat ${REPORT_RESULTS})
 #Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
 QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
 PERC=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $1" " $3}')
