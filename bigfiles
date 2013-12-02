@@ -31,14 +31,18 @@ if [ -z "$code" ]; then
     exit 0
 fi
 
+# Recommend services.hq be a part of your SSH .config file
 scp services.hq:/tmp/plc_report_${code}/results.csv $REPORT_RESULTS
 
 # REBOOT_PLC will always be the last arguement provided
 REBOOT_PLC=$BASH_ARGV
 REPORT=$(cat ${REPORT_RESULTS})
 #Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
-QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $3}')
-PERC=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n | awk '{print $1" " $3}')
+ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n)
+# Narrow down to list of IPs only
+PLCS=$(echo "$ROOT_QUERY" | awk '{print $3}')
+# List of Percent full per IP address
+PERC=$(echo "$ROOT_QUERY" | awk '{print $1" " $3}')
 
 # Cleanup temp files
 function cleanup {
@@ -51,7 +55,7 @@ function save {
 }
 
 # Log in and get top x big files (determined by TOP_FILES)
-for plcs in ${QUERY}; do
+for plcs in ${PLCS}; do
     echo "Checking ${plcs}..."
     PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
     echo "" >> $PLC_FILES
