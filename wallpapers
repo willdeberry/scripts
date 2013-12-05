@@ -14,7 +14,7 @@
 
 # first, make sure there is an author being added. If not, things
 # break
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR=$(pwd)
 FINAL_DIR=$(echo ${DIR##*/})
 
 if [ ! "$1" ]; then
