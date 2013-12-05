@@ -1,0 +1,85 @@
+#!/bin/bash
+# Super lazy way to get all the thing together to add
+# more wallpapers to the SwagPapers (or similar) apps.
+#
+# USAGE: ./make_lazy $AUTHORS_NAME $FIELD_TO_REMOVE
+# FIELD_TO_REMOVE is useful when the original author has
+# added an aokp prefix to the image. We already know this
+# will be an aokp related image, and is unneeded.
+# Currently supported formats are .png and .jpg.
+#
+# In addition to most normal linux apps, this script will
+# require the ImageMagick suit for thumbnail creation.
+# You can find it here http://www.imagemagick.org/script/index.php
+
+# first, make sure there is an author being added. If not, things
+# break
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+FINAL_DIR=$(echo ${DIR##*/})
+
+if [ ! "$1" ]; then
+    echo "author prefix not defined."
+	echo "this is necessary for the script to run. Exiting..."
+	exit 0
+fi
+
+# nuke blank spaces
+rename 'y/ /_/' *
+
+# make all folders and filenames lowercase
+# first, rename all folders (lazy kang from another one of my scripts)
+for f in `find . -depth ! -name CVS -type d`; do
+    g=`dirname "$f"`/`basename "$f" | tr '[A-Z]' '[a-z]'`
+    if [ "xxx$f" != "xxx$g" ]; then
+        echo "Renaming folder $f"
+        mv -f "$f" "$g"
+    fi
+done
+
+# now, rename all files
+for f in `find . ! -type d`; do
+    g=`dirname "$f"`/`basename "$f" | tr '[A-Z]' '[a-z]'`
+    if [ "xxx$f" != "xxx$g" ]; then
+        echo "Renaming file $f"
+        mv -f "$f" "$g"
+    fi
+done
+
+# for adding the authors name to each file
+for file in *.*; do
+    mv "$file" "$1_$file"
+done
+
+# good for removing the "aokp" part from filenames
+if [ "$2" ]; then
+    for file in *.*; do
+        mv "$file" "${f/"$2"/}"
+    done
+fi
+
+# make the xml to paste into wallpaper_manifest.xml
+ls *.png *.jpg | while read line; do
+    author=`echo $line | cut -f1 -d "_"`
+    (cat << EOF) >> $author.xml
+
+        <wallpaper
+            author="$author"
+            url="http://sudoservers.com/photos/${FINAL_DIR}/$line" />
+EOF
+done
+
+mkdir .thumbs
+find . ! -name '*.xml' ! -name 'make_lazy' ! -name '.thumbs' | xargs -i cp {} .thumbs
+cd .thumbs
+mogrify -resize 213x189 *.*
+# add the _small suffix
+ls | while read line; do
+	extension="${line##*.}"
+	filename="${line%.*}"
+	mv $line ../"$filename"_small.$extension
+done
+
+# cleanup
+cd ..
+rm -rf .thumbs
+echo "conversion complete..."
