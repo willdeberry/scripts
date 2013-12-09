@@ -2,9 +2,11 @@
 
 CUSTOM=$(date +"%H%M%S%m%d%y")
 IPADDRESS=$1
-SAVEDIR=/home/$USER/audio/$CUSTOM
+AUDIO=/home/$USER/audio
+SAVEDIR=$AUDIO/$CUSTOM
 OUTDIR=/tmp
 FILE=audio-$IPADDRESS.$CUSTOM.mp3
+REMOVE=$BASH_ARGV
 
 if [ -n "$2" ]; then
     LENGTH=$2
@@ -219,6 +221,11 @@ EOFINVALID
         save32
     fi
 }
+
+if [ "$REMOVE" == "clean" ]; then
+    rm -rf $AUDIO
+    exit 0
+fi
 
 if [[ $IPADDRESS =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
 then
