@@ -15,11 +15,6 @@ function cleanup {
     return $?
 }
 
-function cleanup32 {
-    rm -rf $OUTDIR/sample.*.mp3
-    return $?
-}
-
 function save {
     if [ -e $SAVEDIR ]; then
         mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
