@@ -139,7 +139,6 @@ HELP
 
 control_c() {
     cleanup
-    read -p "$(echo -e '\nPress Enter to exit \n\b')" exitS
     stty echo
     exit $?
 }
