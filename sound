@@ -10,12 +10,12 @@ if [ -n "$2" ]; then
     LENGTH=$2
 fi
 
-function cleanup {
+cleanup() {
     rm -rf $OUTDIR/$FILE
     return $?
 }
 
-function save {
+save() {
     if [ -e $SAVEDIR ]; then
         mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
     else
@@ -24,7 +24,7 @@ function save {
     fi
 }
 
-function save32 {
+save32() {
     if [ -e $SAVEDIR ]; then
         mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
     else
@@ -133,7 +133,7 @@ echo "all done!" >> /dev/stderr
 EOFSSH
 }
 
-function printhelp {
+printhelp() {
 cat <<'HELP'
 sound ${IP_Address} ${Length}
     IP_Address: the IP address of the target PLC
@@ -152,7 +152,7 @@ control_c() {
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
-function start {
+start() {
     echo -n "PLC Password: "
     read -s PASSWORD
 
