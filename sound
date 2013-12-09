@@ -27,7 +27,7 @@ save32() {
         mkdir -p $SAVEDIR
     fi
         mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
-        echo -e "You file is located in $SAVEDIR.\n"
+        echo -e "\nYou file is located in $SAVEDIR.\n"
 }
 
 function record317 {
