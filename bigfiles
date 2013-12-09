@@ -58,7 +58,8 @@ scp services.hq:/tmp/plc_report_${code}/results.csv $REPORT_RESULTS
 REBOOT_PLC=$BASH_ARGV
 REPORT=$(cat ${REPORT_RESULTS})
 #Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
-ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n)
+#Fixed parsing for added HWID in report.csv
+ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $8 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n)
 # Narrow down to list of IPs only
 PLCS=$(echo "$ROOT_QUERY" | awk '{print $3}')
 # List of Percent full per IP address
