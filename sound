@@ -154,7 +154,6 @@ start() {
     VERSION=$(sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS cat /Version.txt)
 
     if [ "$VERSION" == "PLC_3_1_7h_GA" ]; then
-        echo -e "Logging in and running Record script for 3.1.7...\n"
         if [ -z $LENGTH ]; then
             LENGTH="15"
             record317 > $OUTDIR/"$FILE"
@@ -189,7 +188,6 @@ Unbale to connect to PLC to determine version of the PLC.
 Please check for use of correct password or connection to device.
 EOFINVALID
     else
-        echo -e "Logging in and running Record script for 3.2.x...\n"
         if [ -z $LENGTH ]; then
             sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS su - user /opt/GWN/scripts/audio/RecordSamples.sh 15 1>/dev/null
         else
