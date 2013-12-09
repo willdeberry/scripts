@@ -224,45 +224,7 @@ EOFINVALID
         if [ -n "$(find $OUTDIR -name sample.*output*pci*hdmi*.mp3 2>&-)" ]; then
             mv $OUTDIR/sample.*output*pci*hdmi*.mp3 $OUTDIR/sample.output.hdmi.mp3
         fi
-
-        echo -n "Would you like to save the file? (y/n): "
-        read SAVE
-
-        SAVEy=$(echo $SAVE | tr '[:upper:]' '[:lower:]' | head -c 1)
-
-        if [ "$SAVEy" == "y" ]; then
-            save32
-            echo -e "You file is located in $SAVEDIR.\n"
-            echo -e "Options:
-            1) Input  - Tv Tuner
-            2) Input  - Line In Port
-            3) Output - HDMI
-            4) Output - Headset Port
-
-            Hit ANY key to skip playing.\n"
-            echo -n "Would you like to play any of the files? "
-            read PLAY
-
-            case $PLAY in
-                1) cvlc $SAVEDIR/sample.input.TV.Tuner*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                2) cvlc $SAVEDIR/sample.input.line_in*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                3) cvlc $SAVEDIR/sample.output.hdmi*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                4) cvlc $SAVEDIR/sample.output.headphone_jack*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                *) exit
-                    ;;
-            esac
-        else
-            cleanup32
-        fi
-
+        save32
     fi
 }
 
