@@ -16,21 +16,18 @@ cleanup() {
 }
 
 save() {
-    if [ -e $SAVEDIR ]; then
-        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
-    else
+    if [ ! -d $SAVEDIR ]; then
         mkdir -p $SAVEDIR
-        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
     fi
+        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
 }
 
 save32() {
-    if [ -e $SAVEDIR ]; then
-        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
-    else
+    if [ ! -d $SAVEDIR ]; then
         mkdir -p $SAVEDIR
-        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
     fi
+        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
+        echo -e "You file is located in $SAVEDIR.\n"
 }
 
 record317() {
