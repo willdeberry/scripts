@@ -7,10 +7,6 @@ for i in $@; do :; done
 DEVICE=$i
 APK="${@:(-2):1}"
 
-sync() {
-    repo sync -j32
-}
-
 apk() {
     . build/envsetup.sh
     lunch aokp_${DEVICE}-userdebug
@@ -38,10 +34,6 @@ build-all() {
     rm .build_list
 }
 
-die() {
-    exit 0
-}
-
 check() {
     BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
     OUR_HEAD=$(git rev-parse HEAD)
@@ -57,12 +49,12 @@ check() {
     fi
 }
 
-pick() {
-    . build/envsetup.sh
-    cd frameworks/base
-    cd -; cd packages/apps/ROMControl
-    cd -; cd packages/apps/Settings
-    cd -
+clobber() {
+    make clobber -j16
+}
+
+die() {
+    exit 0
 }
 
 help() {
@@ -80,12 +72,20 @@ help() {
   -r, --resume    Resume after a failed Cherry-pick"
 }
 
-clobber() {
-    make clobber -j16
+pick() {
+    . build/envsetup.sh
+    cd frameworks/base
+    cd -; cd packages/apps/ROMControl
+    cd -; cd packages/apps/Settings
+    cd -
 }
 
 remove() {
     find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+}
+
+sync() {
+    repo sync -j32
 }
 
 if [ "$1" == "" ]
@@ -101,14 +101,14 @@ for arg
 do
     delim=""
     case "$arg" in
-        --help) args="${args} -h ";;
-        --clobber) args="${args} -c ";;
-        --sync) args="${args} -s ";;
-        --build) args="${args} -b ";;
         --all) args="${args} -a ";;
+        --build) args="${args} -b ";;
+        --clobber) args="${args} -c ";;
+        --help) args="${args} -h ";;
         --mmm) args="${args} -m ";;
         --pick) args="${args} -p ";;
         --resume) args="${args} -r ";;
+        --sync) args="${args} -s ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
@@ -118,22 +118,22 @@ eval set -- $args
     while getopts ":hsprcam:b:?" option 2>/dev/null
     do
         case $option in
-            h) help
-                exit
-                ;;
-            s) sync
-                ;;
-            c) clobber
+            a) time build-all
                 ;;
             b) build
                 ;;
-            a) time build-all
+            c) clobber
+                ;;
+            h) help
+                exit
                 ;;
             m) apk
                 ;;
             p) pick
                 ;;
             r) resume
+                ;;
+            s) sync
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
