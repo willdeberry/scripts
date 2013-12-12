@@ -5,12 +5,10 @@ DIR="/mnt/storage"
 REMOTE="nas:/mnt/Storage/Public"
 
 if [ -z "$MOUNT" ]; then
-    if [ -d "$DIR" ]; then
-        sudo mount -t nfs -o nolock $REMOTE $DIR
-    else
+    if [ ! -d "$DIR" ]; then
         mkdir $DIR
-        sudo mount -t nfs -o nolock $REMOTE $DIR
     fi
+        sudo mount -t nfs -o nolock $REMOTE $DIR
 else
     sudo umount $DIR
 fi
