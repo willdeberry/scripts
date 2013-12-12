@@ -80,11 +80,6 @@ help() {
   -r, --resume    Resume after a failed Cherry-pick"
 }
 
-clean() {
-    lunch aokp_$DEVICE-userdebug
-    make clean -j16
-}
-
 clobber() {
     make clobber -j16
 }
@@ -107,7 +102,6 @@ do
     delim=""
     case "$arg" in
         --help) args="${args} -h ";;
-        --clean) args="${args} -l ";;
         --clobber) args="${args} -c ";;
         --sync) args="${args} -s ";;
         --build) args="${args} -b ";;
@@ -121,7 +115,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hsprclam:b:?" option 2>/dev/null
+    while getopts ":hsprcam:b:?" option 2>/dev/null
     do
         case $option in
             h) help
@@ -130,8 +124,6 @@ eval set -- $args
             s) sync
                 ;;
             c) clobber
-                ;;
-            l) clean
                 ;;
             b) build
                 ;;
