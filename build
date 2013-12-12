@@ -68,8 +68,7 @@ help() {
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
   -m, --mmm       Compiles the specified apk individually. Requires APK be provided
-  -p, --pick      Cherry-pick the specific changes
-  -r, --resume    Resume after a failed Cherry-pick"
+  -p, --pick      Cherry-pick the specific changes"
 }
 
 pick() {
@@ -107,7 +106,6 @@ do
         --help) args="${args} -h ";;
         --mmm) args="${args} -m ";;
         --pick) args="${args} -p ";;
-        --resume) args="${args} -r ";;
         --sync) args="${args} -s ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
@@ -115,7 +113,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hsprcam:b:?" option 2>/dev/null
+    while getopts ":hspcam:b:?" option 2>/dev/null
     do
         case $option in
             a) time build-all
@@ -130,8 +128,6 @@ eval set -- $args
             m) apk
                 ;;
             p) pick
-                ;;
-            r) resume
                 ;;
             s) sync
                 ;;
