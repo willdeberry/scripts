@@ -8,7 +8,6 @@ DEVICE=$i
 APK="${@:(-2):1}"
 
 apk() {
-    . build/envsetup.sh
     lunch aokp_${DEVICE}-userdebug
     mmm $APK
 }
@@ -18,10 +17,8 @@ build() {
     time brunch $DEVICE
     if [ ! -d "../files/$DEVICE" ]; then
         mkdir -p ../files/$DEVICE
-        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
-    else 
-        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
     fi
+        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
 }
 
 build-all() {
@@ -72,7 +69,6 @@ help() {
 }
 
 pick() {
-    . build/envsetup.sh
     cd frameworks/base
     cd -; cd packages/apps/ROMControl
     cd -; cd packages/apps/Settings
