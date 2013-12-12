@@ -7,17 +7,17 @@ for i in $@; do :; done
 DEVICE=$i
 APK="${@:(-2):1}"
 
-function sync {
+sync() {
     repo sync -j32
 }
 
-function apk {
+apk() {
     . build/envsetup.sh
     lunch aokp_${DEVICE}-userdebug
     mmm $APK
 }
 
-function build {
+build() {
     remove
     time brunch $DEVICE
     if [ ! -d "../files/$DEVICE" ]; then
@@ -28,7 +28,7 @@ function build {
     fi
 }
 
-function build-all {
+build-all() {
     cat $VENDOR/vendorsetup.sh | cut -f2 -d ' ' > .build_list
     while read line ;do
         DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
@@ -38,11 +38,11 @@ function build-all {
     rm .build_list
 }
 
-function die {
+die() {
     exit 0
 }
 
-function check {
+check() {
     BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
     OUR_HEAD=$(git rev-parse HEAD)
     THEIR_HEAD=$(git rev-parse aokp/${BRANCH})
@@ -57,7 +57,7 @@ function check {
     fi
 }
 
-function pick {
+pick() {
     . build/envsetup.sh
     cd frameworks/base
     cd -; cd packages/apps/ROMControl
@@ -65,7 +65,7 @@ function pick {
     cd -
 }
 
-function help {
+help() {
     echo -e "usage: $0 [OPTIONS] APK DEVICE \n"
 
     echo "Options:
@@ -80,16 +80,16 @@ function help {
   -r, --resume    Resume after a failed Cherry-pick"
 }
 
-function clean {
+clean() {
     lunch aokp_$DEVICE-userdebug
     make clean -j16
 }
 
-function clobber {
+clobber() {
     make clobber -j16
 }
 
-function remove {
+remove() {
     find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
 }
 
