@@ -3,7 +3,7 @@ IP=${@: -1}
 SSH_OPTS="-o StrictHostKeyChecking=no -l root"
 SSHP_OPTS="-f ~/.plcssh"
 
-function audio {
+audio() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     cat /opt/GWN/conf/audio.conf
@@ -11,7 +11,7 @@ function audio {
 EOFSSH
 }
 
-function config {
+config() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     if [ -e "/opt/GWN/conf/DisplayConfig.xml" ]; then
@@ -23,7 +23,7 @@ function config {
 EOFSSH
 }
 
-function display {
+display() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     if [ -e "/opt/GWN/scripts/display/DisplayControl.sh" ]; then
@@ -35,7 +35,7 @@ function display {
 EOFSSH
 }
 
-function edid {
+edid() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     getedidinfo identity
@@ -43,7 +43,7 @@ function edid {
 EOFSSH
 }
 
-function fetch {
+fetch() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     doFetch --all && RDC reconfigure_display && /etc/init.d/patientx restart
@@ -52,7 +52,7 @@ EOFSSH
 }
 
 
-function getLogs {
+getLogs() {
     if [ ! -d ~/logs ]; then
       mkdir ~/logs
     fi
@@ -61,7 +61,7 @@ function getLogs {
     sshpass $SSHP_OPTS scp -oStrictHostKeyChecking=no root@$IP:/var/log/messages ~/logs/${IP}_messages.log
 }
 
-function help {
+help() {
     echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
 
     echo -e "Options:
@@ -81,7 +81,7 @@ function help {
 
 }
 
-function ipaddress {
+ipaddress() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     YELLOW="$( echo -e "\e[33;01m" )"
@@ -104,7 +104,7 @@ NETWORK
 EOFSSH
 }
 
-function motd {
+motd() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     helpme --motd
@@ -112,7 +112,7 @@ function motd {
 EOFSSH
 }
 
-function patientx {
+patientx() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     RDC sanitize
@@ -121,7 +121,7 @@ EOFSSH
 }
 
 
-function reboot {
+reboot() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     RDC reboot
@@ -129,7 +129,7 @@ function reboot {
 EOFSSH
 }
 
-function resolution {
+resolution() {
     sshpass $SSHP_OPTS ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     xvidtune -show
