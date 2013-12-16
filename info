@@ -59,6 +59,7 @@ getLogs() {
 
     echo "Getting log from $IP"
     sshpass -f ~/.plcssh scp -oStrictHostKeyChecking=no root@$IP:/var/log/messages ~/logs/${IP}_messages.log
+    echo "Your log is located at ~/logs/${IP}_messages.log"
 }
 
 help() {
