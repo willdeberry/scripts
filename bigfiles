@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Cleanup temp files
 cleanup() {
@@ -27,6 +27,7 @@ FILE_SIZE=/tmp/file_size.txt
 AMOUNT_FOUND=/tmp/amount_found.txt
 PLC_FILES=/tmp/plc_files.txt
 REPORT_RESULTS=/tmp/results.csv
+PLC_LIST=/tmp/plc_list.txt
 
 # Uses first argument to set percentage of full HDD PLCs to check for. 50 or greater by default
 # Account for if a first arguement exist and if it is a number
@@ -59,33 +60,34 @@ REBOOT_PLC=$BASH_ARGV
 REPORT=$(cat ${REPORT_RESULTS})
 #Take the oringal report file and only pull out the PLC's IPs based on percent of free disk space
 #Fixed parsing for added HWID in report.csv
-ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $8 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n)
+ROOT_QUERY=$(echo "$REPORT" | awk -F',' '{print $7 " - " $1}' | awk -F'%' '{print $1 $2}' | awk 'int($1)>='$PERCENT | sort -n)
 # Narrow down to list of IPs only
-PLCS=$(echo "$ROOT_QUERY" | awk '{print $3}')
+PLCS=$(echo "$ROOT_QUERY" | awk '{print $3}' > $PLC_LIST)
 # List of Percent full per IP address
 PERC=$(echo "$ROOT_QUERY" | awk '{print $1" " $3}')
 
 # If $PLCS comes back emtpy, exit the program since there is nothing to check
-if [ -z "$PLCS" ]; then
-    echo "***No PLCs to check***"
-    cleanup
-    exit 0
-fi
+#if [ -z "$PLCS" ]; then
+#    echo "***No PLCs to check***"
+#    cleanup
+#    exit 0
+#fi
 
 # Log in and get top x big files (determined by TOP_FILES)
-for plcs in ${PLCS}; do
-    echo "Checking ${plcs}..."
-    PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
-    echo -e "\n${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plcs} find /* -type f -exec du -a {} + 2>/dev/null | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
-    cat ${FILES_FOUND} | tail -${TOP_FILES} &>> $PLC_FILES
-    # Determine if we should reboot the PLCs while we are logged in
-    # This requires the info script to work
-    if [ "${REBOOT_PLC}" == "reboot" ]; then
-        echo "Rebooting ${plcs}..."
-        info -x ${plcs}
-    fi
-done
+#PERC_FULL=$(echo "$PERC" | grep ${plcs} | awk '{print $1}')
+#echo -e "\n${plcs} - ${PERC_FULL}% Full" &>> $PLC_FILES
+SSH_OPTS="-o StrictHostKeyChecking=no -l root"
+THREADS=$(echo "$PLCS" | wc -l)
+CMD="find /* -type f -exec du -a {} + 2>/dev/null"
+INPUT_FILE=$(cat $PLC_LIST)
+parallel -j${THREADS} -k -a $INPUT_FILE ssh $SSH_OPTS {} "$CMD" | sort -n | tail -${TOP_FILES} &>> $FILES_FOUND
+#cat ${FILES_FOUND} | tail -${TOP_FILES} &>> $PLC_FILES
+# Determine if we should reboot the PLCs while we are logged in
+# This requires the info script to work
+if [ "${REBOOT_PLC}" == "reboot" ]; then
+    echo "Rebooting ${plcs}..."
+    info -x ${plcs}
+fi
 
 # Take the list of big files provided above and organize it
 # Create a list of only unique items and total how many instances of each file
