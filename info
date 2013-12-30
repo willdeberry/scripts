@@ -1,16 +1,17 @@
 #!/bin/bash
 IP=${@: -1}
+SSH_OPTS="-o StrictHostKeyChecking=no -l root"
 
-function audio {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+audio() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     cat /opt/GWN/conf/audio.conf
 
 EOFSSH
 }
 
-function config {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+config() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     if [ -e "/opt/GWN/conf/DisplayConfig.xml" ]; then
         cat /opt/GWN/conf/DisplayConfig.xml
@@ -21,8 +22,8 @@ function config {
 EOFSSH
 }
 
-function display {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+display() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     if [ -e "/opt/GWN/scripts/display/DisplayControl.sh" ]; then
         /opt/GWN/scripts/display/DisplayControl.sh Info
@@ -33,16 +34,16 @@ function display {
 EOFSSH
 }
 
-function edid {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+edid() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     getedidinfo identity
 
 EOFSSH
 }
 
-function fetch {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+fetch() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     doFetch --all && RDC reconfigure_display && /etc/init.d/patientx restart
 
@@ -50,20 +51,17 @@ EOFSSH
 }
 
 
-function getLogs {
+getLogs() {
     if [ ! -d ~/logs ]; then
       mkdir ~/logs
     fi
-    
+
     echo "Getting log from $IP"
-    sshpass -f ~/.plcssh scp root@$IP:/var/log/messages ~/logs/ 
-    if [ -f ~/logs/messages ]; then
-      mv ~/logs/messages ~/logs/${IP}_messages.log
-      echo "File saved as ~/logs/${IP}_messages.log"
-    fi    
+    sshpass -f ~/.plcssh scp -oStrictHostKeyChecking=no root@$IP:/var/log/messages ~/logs/${IP}_messages.log
+    echo "Your log is located at ~/logs/${IP}_messages.log"
 }
 
-function help {
+help() {
     echo -e "\nusage: info [OPTIONS] IPADDRESS \n"
 
     echo -e "Options:
@@ -83,8 +81,8 @@ function help {
 
 }
 
-function ipaddress {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+ipaddress() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     YELLOW="$( echo -e "\e[33;01m" )"
     PURPLE="$( echo -e "\e[35;01m" )"
@@ -106,16 +104,16 @@ NETWORK
 EOFSSH
 }
 
-function motd {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+motd() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     helpme --motd
 
 EOFSSH
 }
 
-function patientx {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+patientx() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     RDC sanitize
 
@@ -123,16 +121,16 @@ EOFSSH
 }
 
 
-function reboot {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+reboot() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     RDC reboot
 
 EOFSSH
 }
 
-function resolution {
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no -l root $IP -T <<'EOFSSH'
+resolution() {
+    sshpass -f ~/.plcssh ssh $SSH_OPTS $IP -T <<'EOFSSH'
 
     xvidtune -show
 

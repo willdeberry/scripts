@@ -2,43 +2,33 @@
 
 CUSTOM=$(date +"%H%M%S%m%d%y")
 IPADDRESS=$1
-SAVEDIR=/home/$USER/audio/$CUSTOM
+AUDIO=/home/$USER/audio
+SAVEDIR=$AUDIO/$CUSTOM
 OUTDIR=/tmp
 FILE=audio-$IPADDRESS.$CUSTOM.mp3
+REMOVE=$BASH_ARGV
 
-if [ -n "$2" ]; then
-    LENGTH=$2
-fi
-
-function cleanup {
+cleanup() {
     rm -rf $OUTDIR/$FILE
     return $?
 }
 
-function cleanup32 {
-    rm -rf $OUTDIR/sample.*.mp3
-    return $?
-}
-
-function save {
-    if [ -e $SAVEDIR ]; then
-        mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
-    else
+save() {
+    if [ ! -d $SAVEDIR ]; then
         mkdir -p $SAVEDIR
+    fi
         mv $OUTDIR/"$FILE" $SAVEDIR/"$FILE"
-    fi
 }
 
-function save32 {
-    if [ -e $SAVEDIR ]; then
-        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
-    else
+save32() {
+    if [ ! -d $SAVEDIR ]; then
         mkdir -p $SAVEDIR
-        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
     fi
+        mv $OUTDIR/sample.*.mp3 $SAVEDIR/.
+        echo -e "\nYou file is located in $SAVEDIR.\n"
 }
 
-function record317 {
+record317() {
 ### process params
 
 RMODE=default
@@ -138,7 +128,7 @@ echo "all done!" >> /dev/stderr
 EOFSSH
 }
 
-function printhelp {
+printhelp() {
 cat <<'HELP'
 sound ${IP_Address} ${Length}
     IP_Address: the IP address of the target PLC
@@ -149,7 +139,6 @@ HELP
 
 control_c() {
     cleanup
-    read -p "$(echo -e '\nPress Enter to exit \n\b')" exitS
     stty echo
     exit $?
 }
@@ -157,7 +146,7 @@ control_c() {
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
-function start {
+start() {
     echo -n "PLC Password: "
     read -s PASSWORD
 
@@ -165,7 +154,6 @@ function start {
     VERSION=$(sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS cat /Version.txt)
 
     if [ "$VERSION" == "PLC_3_1_7h_GA" ]; then
-        echo -e "Logging in and running Record script for 3.1.7...\n"
         if [ -z $LENGTH ]; then
             LENGTH="15"
             record317 > $OUTDIR/"$FILE"
@@ -200,7 +188,6 @@ Unbale to connect to PLC to determine version of the PLC.
 Please check for use of correct password or connection to device.
 EOFINVALID
     else
-        echo -e "Logging in and running Record script for 3.2.x...\n"
         if [ -z $LENGTH ]; then
             sshpass -p $PASSWORD ssh -oStrictHostKeyChecking=no root@$IPADDRESS su - user /opt/GWN/scripts/audio/RecordSamples.sh 15 1>/dev/null
         else
@@ -224,47 +211,18 @@ EOFINVALID
         if [ -n "$(find $OUTDIR -name sample.*output*pci*hdmi*.mp3 2>&-)" ]; then
             mv $OUTDIR/sample.*output*pci*hdmi*.mp3 $OUTDIR/sample.output.hdmi.mp3
         fi
-
-        echo -n "Would you like to save the file? (y/n): "
-        read SAVE
-
-        SAVEy=$(echo $SAVE | tr '[:upper:]' '[:lower:]' | head -c 1)
-
-        if [ "$SAVEy" == "y" ]; then
-            save32
-            echo -e "You file is located in $SAVEDIR.\n"
-            echo -e "Options:
-            1) Input  - Tv Tuner
-            2) Input  - Line In Port
-            3) Output - HDMI
-            4) Output - Headset Port
-
-            Hit ANY key to skip playing.\n"
-            echo -n "Would you like to play any of the files? "
-            read PLAY
-
-            case $PLAY in
-                1) cvlc $SAVEDIR/sample.input.TV.Tuner*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                2) cvlc $SAVEDIR/sample.input.line_in*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                3) cvlc $SAVEDIR/sample.output.hdmi*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                4) cvlc $SAVEDIR/sample.output.headphone_jack*.mp3 --play-and-exit -q
-                    exit
-                    ;;
-                *) exit
-                    ;;
-            esac
-        else
-            cleanup32
-        fi
-
+        save32
     fi
 }
+
+if [ "$REMOVE" == "clean" ]; then
+    rm -rf $AUDIO
+    exit 0
+fi
+
+if [ -n "$2" ]; then
+    LENGTH=$2
+fi
 
 if [[ $IPADDRESS =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
 then

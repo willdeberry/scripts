@@ -7,28 +7,21 @@ for i in $@; do :; done
 DEVICE=$i
 APK="${@:(-2):1}"
 
-function sync {
-    repo sync -j32
-}
-
-function apk {
-    . build/envsetup.sh
+apk() {
     lunch aokp_${DEVICE}-userdebug
     mmm $APK
 }
 
-function build {
+build() {
     remove
     time brunch $DEVICE
     if [ ! -d "../files/$DEVICE" ]; then
         mkdir -p ../files/$DEVICE
-        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
-    else 
-        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
     fi
+        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
 }
 
-function build-all {
+build-all() {
     cat $VENDOR/vendorsetup.sh | cut -f2 -d ' ' > .build_list
     while read line ;do
         DEVNAME=$(echo $line | cut -f2 -d ' ' | cut -f2 -d '_' | cut -f1 -d '-')
@@ -38,11 +31,7 @@ function build-all {
     rm .build_list
 }
 
-function die {
-    exit 0
-}
-
-function check {
+check() {
     BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
     OUR_HEAD=$(git rev-parse HEAD)
     THEIR_HEAD=$(git rev-parse aokp/${BRANCH})
@@ -57,15 +46,15 @@ function check {
     fi
 }
 
-function pick {
-    . build/envsetup.sh
-    cd frameworks/base
-    cd -; cd packages/apps/ROMControl
-    cd -; cd packages/apps/Settings
-    cd -
+clobber() {
+    make clobber -j16
 }
 
-function help {
+die() {
+    exit 0
+}
+
+help() {
     echo -e "usage: $0 [OPTIONS] APK DEVICE \n"
 
     echo "Options:
@@ -76,21 +65,22 @@ function help {
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
   -m, --mmm       Compiles the specified apk individually. Requires APK be provided
-  -p, --pick      Cherry-pick the specific changes
-  -r, --resume    Resume after a failed Cherry-pick"
+  -p, --pick      Cherry-pick the specific changes"
 }
 
-function clean {
-    lunch aokp_$DEVICE-userdebug
-    make clean -j16
+pick() {
+    cd frameworks/base
+    cd -; cd packages/apps/ROMControl
+    cd -; cd packages/apps/Settings
+    cd -
 }
 
-function clobber {
-    make clobber -j16
-}
-
-function remove {
+remove() {
     find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+}
+
+sync() {
+    repo sync -j32
 }
 
 if [ "$1" == "" ]
@@ -106,42 +96,36 @@ for arg
 do
     delim=""
     case "$arg" in
-        --help) args="${args} -h ";;
-        --clean) args="${args} -l ";;
-        --clobber) args="${args} -c ";;
-        --sync) args="${args} -s ";;
-        --build) args="${args} -b ";;
         --all) args="${args} -a ";;
+        --build) args="${args} -b ";;
+        --clobber) args="${args} -c ";;
+        --help) args="${args} -h ";;
         --mmm) args="${args} -m ";;
         --pick) args="${args} -p ";;
-        --resume) args="${args} -r ";;
+        --sync) args="${args} -s ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hsprclam:b:?" option 2>/dev/null
+    while getopts ":hspcam:b:?" option 2>/dev/null
     do
         case $option in
-            h) help
-                exit
-                ;;
-            s) sync
-                ;;
-            c) clobber
-                ;;
-            l) clean
+            a) time build-all
                 ;;
             b) build
                 ;;
-            a) time build-all
+            c) clobber
+                ;;
+            h) help
+                exit
                 ;;
             m) apk
                 ;;
             p) pick
                 ;;
-            r) resume
+            s) sync
                 ;;
             :) echo "Option -$OPTARG requires an argument."
                 help
