@@ -80,7 +80,7 @@ remove() {
 }
 
 sync() {
-    repo sync -j32
+    repo sync -j8
 }
 
 if [ "$1" == "" ]
