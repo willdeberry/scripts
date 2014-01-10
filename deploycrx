@@ -11,10 +11,12 @@ case "$1" in
             "prod")
                 FOLDER="/home/rob/chrome-dev/GWN-RealTime"
                 KEY="/home/rob/chrome-dev/keys/prod.pem"
+                END="me.crx"
                 ;;
             "dev")
                 FOLDER="/home/rob/chrome-dev/GWN-RealTime_LR"
                 KEY="/home/rob/chrome-dev/keys/dev.pem"
+                END="LR.crx"
                 ;;
             *)
                 exit
@@ -38,17 +40,18 @@ sed -i 's/"version.*$/"version": "'$VERSION'",/g' $FOLDER/manifest.json
 # Update the remote update file
 echo "* Updating Updates.xml"
 cd /home/rob/chrome-dev/builds
-sed -i "s/LR.crx.*$/LR.crx' version='$VERSION' \/>/g" updates.xml
+pwd
+sed -i "s/$END.*$/$END' version='$VERSION' \/>/g" updates.xml
 
 # Pack the crx
 echo "* Packing extension to CRX file"
 /usr/bin/chromium --pack-extension=$FOLDER --pack-extension-key=$KEY
+mv /home/rob/chrome-dev/*.crx /home/rob/chrome-dev/builds/.
 
 # Commit & push build
 echo "* Pushing Builds"
 git commit -am "${NOTES}"
 git tag $VERSION
-git push --tags
 git push
 
 # Commit & push branch
@@ -56,7 +59,6 @@ echo "* Pushing $FOLDER"
 cd $FOLDER
 git commit -am "${NOTES}"
 git tag $VERSION
-git push --tags
 git push
 
 echo "Deployed $1 $VERSION"
