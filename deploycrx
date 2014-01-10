@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+##################################
+# RealTime Deployment Tool
+#
+#
+##################################
+
+# Get CLI args
+case "$1" in
+            "prod")
+                FOLDER="/home/rob/chrome-dev/GWN-RealTime"
+                KEY="/home/rob/chrome-dev/keys/prod.pem"
+                ;;
+            "dev")
+                FOLDER="/home/rob/chrome-dev/GWN-RealTime_LR"
+                KEY="/home/rob/chrome-dev/keys/dev.pem"
+                ;;
+            *)
+                exit
+                ;;
+esac
+VERSION=$2
+DIR=pwd
+# Get comment
+echo -n "Enter build notes: "
+read NOTES
+
+# Update README
+echo "* Updating README.md"
+cd $FOLDER
+sed -i "9 i\* ${VERSION} - $NOTES" README.md
+
+# Update manifest
+echo "* Updating Manifest.json"
+sed -i 's/"version.*$/"version": "'$VERSION'",/g' $FOLDER/manifest.json 
+
+# Update the remote update file
+echo "* Updating Updates.xml"
+cd /home/rob/chrome-dev/builds
+sed -i "s/LR.crx.*$/LR.crx' version='$VERSION' \/>/g" updates.xml
+
+# Pack the crx
+echo "* Packing extension to CRX file"
+/usr/bin/chromium --pack-extension=$FOLDER --pack-extension-key=$KEY
+
+# Commit & push build
+echo "* Pushing Builds"
+git commit -am "${NOTES}"
+git tag $VERSION
+git push --tags
+git push
+
+# Commit & push branch
+echo "* Pushing $FOLDER"
+cd $FOLDER
+git commit -am "${NOTES}"
+git tag $VERSION
+git push --tags
+git push
+
+echo "Deployed $1 $VERSION"
