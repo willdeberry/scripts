@@ -8,19 +8,14 @@
 function usage { 
     echo "For a single PLC:
     ${0} [IP]
-For multipule PLCs:
+For multiple PLCs:
     ${0} [FILE]
-
           IP:  The IP of the PLC
         FILE:  Path to CSV file from the reporting tool (assumes free_space.csv if not supplied)"
 
     exit
 }
 
-# Cleanup temp files
-function cleanup {
-    rm -rf $TEMP_FILE
-}
 
 # Log in and get top x big files (determined by TOP_FILES)
 
@@ -46,7 +41,9 @@ for plc in ${QUERY}; do
     echo "Grabbing Channel Line Up ${plc}..."
 
     ## Find locates file on system. Find also scours the .aufs hidden file, the grep -v removes these dupicate entries
-    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plc} find / -name ${FileName} -exec FetchChannelLineup.sh && RDC getpage http://appserver.gwn/GWN PLS
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plc} -T <<'EOFSSH'
+     /opt/GWN/scripts/FetchChannelLineup.sh && /opt/GWN/scripts/processRDC getpage http://appserver.gwn/GWN PLS
+EOFSSH
 done
 
 
