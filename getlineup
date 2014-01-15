@@ -1,0 +1,54 @@
+#!/bin/bash
+# Find the exact PLCs that have any file, using csv
+# Or find the size of any file on any number of PLCs.
+#
+
+# global constants
+
+function usage { 
+    echo "For a single PLC:
+    ${0} [IP]
+For multipule PLCs:
+    ${0} [FILE]
+
+          IP:  The IP of the PLC
+        FILE:  Path to CSV file from the reporting tool (assumes free_space.csv if not supplied)"
+
+    exit
+}
+
+# Cleanup temp files
+function cleanup {
+    rm -rf $TEMP_FILE
+}
+
+# Log in and get top x big files (determined by TOP_FILES)
+
+   
+
+#
+# Get args, fail to usage if issues
+if [ -n "$1" ]; then
+    # Checks if $2 is a valid IP
+    if [[ $1 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        QUERY=$1
+    else 
+        QUERY=$(cat PAH.csv | awk -F',' '{print $1}')
+    fi
+else
+    usage
+fi
+
+
+
+# Get the goods
+for plc in ${QUERY}; do
+    echo "Grabbing Channel Line Up ${plc}..."
+
+    ## Find locates file on system. Find also scours the .aufs hidden file, the grep -v removes these dupicate entries
+    sshpass -f ~/.plcssh ssh -oStrictHostKeyChecking=no root@${plc} find / -name ${FileName} -exec FetchChannelLineup.sh && RDC getpage http://appserver.gwn/GWN PLS
+done
+
+
+## Clean up and bail
+cleanup &>/dev/null
