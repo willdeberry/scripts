@@ -1,0 +1,13 @@
+#!/bin/bash
+
+DEVICE=${1}
+
+scp rainbow.aokp.co:/home/will/kk/out/target/product/${DEVICE}/system/priv-app/SystemUI.apk ~/downloads/.
+adb start-server
+adb shell pkill -TERM -f com.android.systemui
+adb remount
+adb push downloads/SystemUI.apk /system/priv-app/SystemUI.apk
+adb shell pkill -TERM -f com.android.systemui
+adb shell chmod 0644 /system/priv-app/SystemUI.apk
+sleep 2
+adb shell am startservice -n com.android.systemui/.SystemUIService

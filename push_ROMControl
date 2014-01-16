@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DEVICE=${1}
+
+scp rainbow.aokp.co:/home/will/kk/out/target/product/${DEVICE}/system/app/ROMControl.apk ~/downloads/.
+adb start-server
+adb remount
+adb push downloads/ROMControl.apk /system/app/ROMControl.apk
+sleep 2
+adb shell am startservice -n com.android.systemui/.SystemUIService
