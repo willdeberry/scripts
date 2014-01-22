@@ -46,7 +46,7 @@ sed -i "s/$END.*$/$END' version='$VERSION' \/>/g" updates.xml
 # Pack the crx
 echo "* Packing extension to CRX file"
 /usr/bin/chromium --pack-extension=$FOLDER --pack-extension-key=$KEY
-mv /home/rob/chrome-dev/*.crx /home/rob/chrome-dev/builds/.
+mv /home/rob/chrome-dev/*.crx /home/rob/Dropbox/Public/.
 
 # Commit & push build
 echo "* Pushing Builds"
