@@ -44,7 +44,7 @@ pwd
 sed -i "s/$END.*$/$END' version='$VERSION' \/>/g" updates.xml
 
 # Pack the crx
-echo "* Packing extension to CRX file"
+echo "* Packing extension to CRX file, deploying on dropbox"
 /usr/bin/chromium --pack-extension=$FOLDER --pack-extension-key=$KEY
 mv /home/rob/chrome-dev/*.crx /home/rob/Dropbox/Public/.
 
