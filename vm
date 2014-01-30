@@ -3,7 +3,7 @@
 function controlWinXP {
     VM=$(ps ax | grep -i "[W]indows XP")
     if [ -n "$VM" ]; then
-        vboxmanage controlvm "Windows XP" poweroff
+        vboxmanage controlvm "Windows XP" savestate
     else
         vboxmanage startvm "Windows XP"
     fi
