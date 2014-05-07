@@ -13,12 +13,15 @@ apk() {
 }
 
 build() {
-    remove
-    time brunch $DEVICE
-    if [ ! -d "../files/$DEVICE" ]; then
-        mkdir -p ../files/$DEVICE
-    fi
-        find . -name aokp_${DEVICE}_\*.zip -exec cp {} ../files/$DEVICE/ \; -exec echo "Successfully copied to Androtransfer..." \;
+    while [ -n "${1}" ]; do
+        remove
+        time brunch $1
+        if [ ! -d "../files/$1" ]; then
+            mkdir -p ../files/$1
+        fi
+        find . -name aokp_${1}_\*.zip -exec cp {} ../files/$1/ \; -exec echo "Successfully copied to Androtransfer..." \;
+        shift 1
+    done
 }
 
 build-all() {
@@ -114,7 +117,7 @@ eval set -- $args
         case $option in
             a) time build-all
                 ;;
-            b) build
+            b) build "${@:2}"
                 ;;
             c) clobber
                 ;;
