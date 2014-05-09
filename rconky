@@ -8,5 +8,7 @@ else
     conky -c ~/.config/conky/rings &
     sleep 5
     conky -c ~/.config/conky/cpu &
+    conky -c ~/.config/conky/procs &
+    conky -c ~/.config/conky/ram &
     conky -c ~/.config/conky/mem
 fi

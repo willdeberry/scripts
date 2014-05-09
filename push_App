@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DEVICE=${2}
+APP=${1}
+
+scp rainbow.aokp.co:/home/will/kk/out/target/product/${DEVICE}/system/app/${APP}.apk ~/downloads/.
+adb start-server
+adb remount
+adb push ~/downloads/${APP}.apk /system/app/${APP}.apk
