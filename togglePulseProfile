@@ -1,0 +1,11 @@
+#!/bin/bash
+
+INDEX=$( pacmd list-cards | paxml.py | xmlstarlet sel -t -m "//card[properties/device.bus='bluetooth']" -v "@index" )
+PROFILE=$( pacmd list-cards | paxml.py | xmlstarlet sel -t -v "//card[@index='${INDEX}']/active_profile" )
+
+if [ "$PROFILE" == "a2dp" ]; then
+    pacmd set-card-profile "${INDEX}" hsp
+    exit
+fi
+
+pacmd set-card-profile "${INDEX}" a2dp
