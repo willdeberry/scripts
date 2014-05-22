@@ -16,6 +16,9 @@ build() {
     while [ -n "${1}" ]; do
         remove
         time brunch $1
+        if [ "$?" != 0 ]; then
+            exit 1
+        fi
         if [ ! -d "../files/$1" ]; then
             mkdir -p ../files/$1
         fi
