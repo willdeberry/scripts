@@ -5,10 +5,10 @@ if [ -n "$(ps ax | grep -i '[c]onky' | grep -v rconky)" ]; then
     pkill conky
 else
     sleep 5
-    conky -c ~/.config/conky/rings &
+    conky -c $SCRIPTS/rings &
     sleep 5
-    conky -c ~/.config/conky/cpu &
-    conky -c ~/.config/conky/procs &
-    conky -c ~/.config/conky/ram &
-    conky -c ~/.config/conky/mem
+    conky -c $SCRIPTS/cpu &
+    conky -c $SCRIPTS/procs &
+    conky -c $SCRIPTS/ram &
+    conky -c $SCRIPTS/mem
 fi

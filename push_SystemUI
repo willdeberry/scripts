@@ -2,11 +2,11 @@
 
 DEVICE=${1}
 
-scp rainbow.aokp.co:/home/will/kk/out/target/product/${DEVICE}/system/priv-app/SystemUI.apk ~/downloads/.
+scp rainbow.aokp.co:/home/will/kk/out/target/product/${DEVICE}/system/priv-app/SystemUI.apk ~/Downloads/.
 adb start-server
 adb shell pkill -TERM -f com.android.systemui
 adb remount
-adb push downloads/SystemUI.apk /system/priv-app/SystemUI.apk
+adb push ~/Downloads/SystemUI.apk /system/priv-app/SystemUI.apk
 adb shell pkill -TERM -f com.android.systemui
 adb shell chmod 0644 /system/priv-app/SystemUI.apk
 sleep 2
