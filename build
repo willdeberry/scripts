@@ -38,16 +38,12 @@ build-all() {
 }
 
 recovery() {
-    while [ -n "${1}" ]; do
-        remove
-
         lunch aokp_${1}-userdebug
         time mka recoveryimage
         if [ "$?" != 0 ]; then
             exit 1
         fi
         shift 1
-    done
 }
 
 check() {
@@ -130,7 +126,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hspcarm:b:?" option 2>/dev/null
+    while getopts ":hspcar:m:b:?" option 2>/dev/null
     do
         case $option in
             a) time build-all
@@ -146,7 +142,7 @@ eval set -- $args
                 ;;
             p) pick
                 ;;
-            r) recovery
+            r) recovery "${@:2}"
                 ;;
             s) sync
                 ;;
