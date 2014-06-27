@@ -37,6 +37,19 @@ build-all() {
     rm .build_list
 }
 
+recovery() {
+    while [ -n "${1}" ]; do
+        remove
+
+        lunch aokp_${1}-userdebug
+        time mka recoveryimage
+        if [ "$?" != 0 ]; then
+            exit 1
+        fi
+        shift 1
+    done
+}
+
 check() {
     BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
     OUR_HEAD=$(git rev-parse HEAD)
@@ -71,6 +84,7 @@ help() {
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
   -m, --mmm       Compiles the specified apk individually. Requires APK be provided
+  -r, --recovery  Compiles the specified device's recovery image.
   -p, --pick      Cherry-pick the specific changes"
 }
 
@@ -109,13 +123,14 @@ do
         --mmm) args="${args} -m ";;
         --pick) args="${args} -p ";;
         --sync) args="${args} -s ";;
+        --recovery) args="${args} -r ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
         args="${args}${delim}${arg}${delim} ";;
     esac
 done
 
 eval set -- $args
-    while getopts ":hspcam:b:?" option 2>/dev/null
+    while getopts ":hspcarm:b:?" option 2>/dev/null
     do
         case $option in
             a) time build-all
@@ -130,6 +145,8 @@ eval set -- $args
             m) apk
                 ;;
             p) pick
+                ;;
+            r) recovery
                 ;;
             s) sync
                 ;;
