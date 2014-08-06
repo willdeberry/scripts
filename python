@@ -1,0 +1,8 @@
+#!/bin/bash
+script=$(readlink -f -- "$1")
+case "$script" in (/home/will/code/misc/dcommit/*)
+    exec python2 "$@"
+    ;;
+esac
+
+exec python3 "$@"
