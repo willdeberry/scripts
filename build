@@ -14,7 +14,7 @@ apk() {
 
 build() {
     while [ -n "${1}" ]; do
-        remove
+        remove $1
         time brunch $1
         if [ "$?" != 0 ]; then
             exit 1
@@ -22,7 +22,7 @@ build() {
         if [ ! -d "../files/$1" ]; then
             mkdir -p ../files/$1
         fi
-        find . -name aokp_${1}_\*.zip -exec cp {} ../files/$1/ \; -exec echo "Successfully copied to Androtransfer..." \;
+        find $BUILD_DIR/out/target/product/$1 -name aokp_${1}_\*.zip -exec cp {} ../files/$1/ \; -exec echo "Successfully copied to xferAOKP..." \;
         shift 1
     done
 }
@@ -92,7 +92,9 @@ pick() {
 }
 
 remove() {
-    find . -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+    if [ -e out/target/product/${1} ]; then
+        find $BUILD_DIR/out/target/product/${1} -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
+    fi
 }
 
 sync() {
