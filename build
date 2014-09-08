@@ -62,7 +62,8 @@ check() {
 }
 
 clobber() {
-    make clobber -j16
+#    make clobber -j16
+    rm -rf out/target/product
 }
 
 die() {
