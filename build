@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 BUILD_DIR=$(pwd)
 VENDOR=${BUILD_DIR}/vendor/aokp
 MANIFEST=${BUILD_DIR}/.repo/manifest.xml
