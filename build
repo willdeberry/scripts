@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 BUILD_DIR=$(pwd)
 VENDOR=${BUILD_DIR}/vendor/aokp
 MANIFEST=${BUILD_DIR}/.repo/manifest.xml
@@ -14,15 +14,12 @@ apk() {
 
 build() {
     while [ -n "${1}" ]; do
-        remove $1
-        time brunch $1
+#        remove $1
+#        time brunch $1
         if [ "$?" != 0 ]; then
             exit 1
         fi
-        if [ ! -d "../files/$1" ]; then
-            mkdir -p ../files/$1
-        fi
-        find $BUILD_DIR/out/target/product/$1 -name aokp_${1}_\*.zip -exec cp {} ../files/$1/ \; -exec echo "Successfully copied to xferAOKP..." \;
+	rsync -azvPR --include="aokp_${1}_*.zip" --exclude='*' ${BUILD_DIR}/out/target/product/${1}/ xfer.aokp.co:${1}/.
         shift 1
     done
 }
