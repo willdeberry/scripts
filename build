@@ -14,8 +14,8 @@ apk() {
 
 build() {
     while [ -n "${1}" ]; do
-#        remove $1
-#        time brunch $1
+        remove $1
+        time brunch $1
         if [ "$?" != 0 ]; then
             exit 1
         fi
