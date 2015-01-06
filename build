@@ -19,10 +19,7 @@ build() {
         if [ "$?" != 0 ]; then
             exit 1
         fi
-        if [ ! -d "../files/$1" ]; then
-            mkdir -p ../files/$1
-        fi
-        find $BUILD_DIR/out/target/product/$1 -name aokp_${1}_\*.zip -exec cp {} ../files/$1/ \; -exec echo "Successfully copied to xferAOKP..." \;
+	rsync -azvPR --include="aokp_${1}_*.zip" --exclude='*' ${BUILD_DIR}/out/target/product/${1}/ xfer.aokp.co:${1}/.
         shift 1
     done
 }
