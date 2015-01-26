@@ -1,7 +1,6 @@
 #!/bin/bash
 BUILD_DIR=$(pwd)
 VENDOR=${BUILD_DIR}/vendor/aokp
-MANIFEST=${BUILD_DIR}/.repo/manifest.xml
 
 for i in $@; do :; done
 DEVICE=$i
@@ -13,13 +12,36 @@ apk() {
 }
 
 build() {
+	source ~/.pushbullet
+
+	if [ -d "${BUILD_DIR}/vendor/cm" ]; then
+		local url1="cm-12"
+		local url2="UNOFFICIAL"
+	else
+		local url1="aokp"
+		local url2="nightly"
+	fi
+
     while [ -n "${1}" ]; do
         time brunch $1
+
         if [ "$?" != 0 ]; then
+		 	curl -u v13IMrkYOtKFw6okWwPj0jSnGFB3P8PGmjujCXizwxtBI: -X POST https://api.pushbullet.com/v2/pushes -d device_iden="ujCXizwxtBIdjzWIEVDzOK" -d type="note" -d title="Build Complete" -d body="${1} ROM Built Failed!"
             exit 1
         fi
+
 		rsync -azP --include="aokp_${1}_*.zip" --include="cm-12-*-${1}.zip" --exclude='*' out/target/product/${1}/ xfer.aokp.co:${1}
-		rsync -azP -e 'ssh -p 443' --include="aokp_${1}_*.zip" --include="cm-12-*-${1}.zip" --exclude='*' out/target/product/${1}/ sudoservers.com:/home/storage/android/${1}
+
+		case $1 in
+			"jfltevzw")
+				curl -u ${APIKEY_MINE} -X POST https://api.pushbullet.com/v2/pushes -d device_iden="${PHONE_MINE}" -d type="link" -d title="Build Complete" -d body="${1} ROM Built Successfully!" -d url="http://xfer.aokp.co/get.php?p=willdeberry/${1}/${url1}-$( date -u +%Y%m%d )-${url2}-${1}.zip"
+				;;
+			"m7vzw")
+				curl -u ${API_KEY_MINE} -X POST https://api.pushbullet.com/v2/pushes -d device_iden="${PHONE_MINE}" -d type="note" -d title="Build Complete" -d body="${1} ROM Built Successfully!"
+				curl -u ${APIKEY_WIFE} -X POST https://api.pushbullet.com/v2/pushes -d device_iden="${PHONE_WIFE}" -d type="link" -d title="Build Complete" -d body="${1} ROM Built Successfully!" -d url="http://xfer.aokp.co/get.php?p=willdeberry/${1}/${url1}-$( date -u +%Y%m%d )-${url2}-${1}.zip"
+				;;
+		esac
+
         shift 1
     done
 }
@@ -43,21 +65,6 @@ recovery() {
         shift 1
 }
 
-check() {
-    BRANCH=$(grep "platform_manifest" ${MANIFEST} | awk -F'"' '{print $8}')
-    OUR_HEAD=$(git rev-parse HEAD)
-    THEIR_HEAD=$(git rev-parse aokp/${BRANCH})
-    GIT_STATUS=$(git status | grep nothing)
-
-    if [ "${OUR_HEAD}" == "${THEIR_HEAD}" ]; then
-        echo "Cherry-pick was not cleanly merged, please addres..."
-        echo "Failed to pick clean in $pwd"
-        die
-    elif [ -z "${GIT_STATUS}" ]; then
-        git commit -a
-    fi
-}
-
 clobber() {
 #    make clobber -j16
     rm -rf out/target/product
@@ -78,21 +85,7 @@ help() {
   -b, --build     Builds the current source. Requires DEVICE be provided
   -a, --all       Builds all devices listed in $VENDOR/vendorsetup.sh
   -m, --mmm       Compiles the specified apk individually. Requires APK be provided
-  -r, --recovery  Compiles the specified device's recovery image.
-  -p, --pick      Cherry-pick the specific changes"
-}
-
-pick() {
-    cd frameworks/base
-    cd -; cd packages/apps/ROMControl
-    cd -; cd packages/apps/Settings
-    cd -
-}
-
-remove() {
-    if [ -e out/target/product/${1} ]; then
-        find $BUILD_DIR/out/target/product/${1} -name aokp_\*.zip -exec rm -rf {} \; -exec echo "Removing previous builds" \;
-    fi
+  -r, --recovery  Compiles the specified device's recovery image."
 }
 
 sync() {
@@ -117,7 +110,6 @@ do
         --clobber) args="${args} -c ";;
         --help) args="${args} -h ";;
         --mmm) args="${args} -m ";;
-        --pick) args="${args} -p ";;
         --sync) args="${args} -s ";;
         --recovery) args="${args} -r ";;
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
@@ -126,7 +118,7 @@ do
 done
 
 eval set -- $args
-    while getopts ":hspcar:m:b:?" option 2>/dev/null
+    while getopts ":hscar:m:b:?" option 2>/dev/null
     do
         case $option in
             a) time build-all
@@ -139,8 +131,6 @@ eval set -- $args
                 exit
                 ;;
             m) apk
-                ;;
-            p) pick
                 ;;
             r) recovery "${@:2}"
                 ;;
