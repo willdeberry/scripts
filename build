@@ -30,10 +30,10 @@ build() {
             exit 1
         fi
 
-		rsync -azP --include="aokp_${1}_*.zip" --include="cm-12-*-${1}.zip" --exclude='*' out/target/product/${1}/ xfer.aokp.co:${1}
+		rsync -azP --include="aokp_${1}_*.zip" --include="cm-12-*-${1}.zip" --exclude='*' out/target/product/${1}/ xfer.aokp.co:xfer/${1}
 
 		case $1 in
-			"jfltevzw")
+			"shamu")
 				curl -u ${APIKEY_MINE} -X POST https://api.pushbullet.com/v2/pushes -d device_iden="${PHONE_MINE}" -d type="link" -d title="Build Complete" -d body="${1} ROM Built Successfully!" -d url="http://xfer.aokp.co/get.php?p=willdeberry/${1}/${url1}-$( date -u +%Y%m%d )-${url2}-${1}.zip"
 				;;
 			"m7vzw")
