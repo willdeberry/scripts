@@ -1,6 +1,6 @@
 #!/bin/bash
 script=$(readlink -f -- "$1")
-case "$script" in (/home/will/code/misc/dcommit/*|/usr/bin/repo|/home/will/kk/*|/home/will/scripts/*|/usr/bin/make)
+case "$script" in (/home/will/code/misc/dcommit/*|/usr/bin/repo|/home/will/kk/*|/home/will/lol/*|/home/will/aokp/*|/home/will/scripts/*|/usr/bin/make|/home/will/open/*|/home/will/repos/*)
     exec python2 "$@"
     ;;
 esac
