@@ -1,0 +1,50 @@
+#!/bin/bash
+
+find_filename() {
+	unrar v *.rar | head -n +9 | tail -n -1 | awk '{print $8}'
+}
+
+unpack_rar() {
+	unrar x -y *.rar
+}
+
+fix_perms() {
+	local filename
+
+	filename="${1}"
+
+	chown nobody.nogroup "${filename}"
+}
+
+transfer() {
+	local filename category destination
+
+	filename="${1}"
+	category="${2}"
+
+	if [[ "${category}" == 'TV' ]]; then
+		local parent_folder
+
+		parent_folder="$( echo "${filename}" | sed -e 's/\(.*\)\.[sS][0-9].*/\1/'g -e 's/\./ /g' )"
+		destination="/home/storage/Videos/${category}/${parent_folder}"
+	else
+		destination="/home/storage/Videos/${category}"
+	fi
+
+	rsync -azvP "${filename}" "${destination}/."
+}
+
+main() {
+	local filename category
+
+	category="${1}"
+	filename="$(find_filename)"
+
+	unpack_rar
+	fix_perms "${filename}"
+	transfer "${filename}" "${category}"
+}
+
+if [[ "$BASH_SOURCE" == "$0" ]]; then
+	main "${@}"
+fi
